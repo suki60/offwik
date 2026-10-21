@@ -1,0 +1,16 @@
+services:
+  db:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_USER: wiki
+      POSTGRES_PASSWORD: wiki
+      POSTGRES_DB: wiki
+    ports:
+      - "5432:5432"
+    # Default /dev/shm (64 MB) is too small for parallel HNSW builds later.
+    shm_size: 1g
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

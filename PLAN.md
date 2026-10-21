@@ -37,13 +37,13 @@ A TypeScript project to practise RAG on a big dataset: an agent that answers que
 9. **Optional: scale up.** Towards 1M+ chunks or full English Wikipedia: `halfvec` to halve storage, build time and memory, index size. Only if the earlier stages are solid.
 
 ## Status
-- Not started. Stage 0 is next.
+- Stage 0 done (2026-10-21): scaffold, `compose.yaml` (Postgres on host port 5432), `src/config.ts`. `npm run check` verified Postgres 17.11 + pgvector 0.8.7, `qwen3.5:9b` and `nomic-embed-text`. Stage 1 is next.
 
-## Environment (checked in agent-fundamentals-2, re-check here)
-- Node 24.15, npm 11, Docker.
-- Ollama 0.32.1 with `qwen3:4b`, `qwen3:14b`, `qwen3.5:9b`, `nomic-embed-text`.
+## Environment (re-checked 2026-10-21)
+- Node 24.22, npm 11.19 (blocks install scripts by default; tsx works without esbuild's postinstall), Docker 29.8.
+- Ollama 0.40.4 with `qwen3:4b`, `qwen3:14b`, `qwen3.5:9b`, `nomic-embed-text`.
 - `pgvector/pgvector:pg17` image ships pgvector 0.8.7.
-- Port 8080 is used by SearXNG (agent-fundamentals-2 compose). Postgres on 5432 is also used by agent-fundamentals-2: stop that one, or use another port (e.g. 5433) here.
+- Port 8080 is used by SearXNG (agent-fundamentals-2 compose). Postgres on 5432 is also used by agent-fundamentals-2: this project uses 5432 too, so stop that one before `docker compose up` here.
 
 ## Packages (check installed versions before using)
 - Known to work together: `ai@^5` (pinned; latest on npm is 7) + `@ai-sdk/openai-compatible@^1`, `zod@4`, `pg@8` + `@types/pg`, `ink@6` + `react@19`, dev `typescript@7`, `tsx`, `@biomejs/biome`, `@types/node`.
