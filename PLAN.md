@@ -18,6 +18,7 @@ A TypeScript project to practise RAG on a big dataset: an agent that answers que
 ## How to work with me
 - One stage at a time. Keep each stage small and runnable, and stop after it so I can run it. Do not implement stages ahead of the current one.
 - Make every step as simple as possible. Plain, readable code, no abstractions I haven't asked for.
+- Each stage keeps only what it uses: delete files, npm scripts and dependencies the current stage does not run (e.g. `check.ts` is not needed in stage 1). They stay in git history; bring them back when a stage needs them.
 - Before using any API, library or dataset path, check the **installed** version's types/docs or the real file listing instead of relying on memory.
 - Test against my running Ollama and Postgres. Tell me what you verified and what you did not. Numbers from memory must be marked as such.
 - After each stage give me 2-3 interview-style questions about what we built, and one experiment that breaks something on purpose.
@@ -37,7 +38,18 @@ A TypeScript project to practise RAG on a big dataset: an agent that answers que
 9. **Optional: scale up.** Towards 1M+ chunks or full English Wikipedia: `halfvec` to halve storage, build time and memory, index size. Only if the earlier stages are solid.
 
 ## Status
-- Stage 0 done (2026-10-21): scaffold, `compose.yaml` (Postgres on host port 5432), `src/config.ts`. `npm run check` verified Postgres 17.11 + pgvector 0.8.7, `qwen3.5:9b` and `nomic-embed-text`. Stage 1 is next.
+- Stage 0 done (2026-10-21): scaffold, `compose.yaml` (Postgres on host port 5432), `src/config.ts`. `npm run check` verified Postgres 17.11 + pgvector 0.8.7, `qwen3.5:9b` and `nomic-embed-text`.
+- Stage 1 done (2026-10-21): `npm run download` (curl, 157 MB, sha256 matches the LFS oid), `npm run explore` (DuckDB, <1 s). Removed `check.ts`, `config.ts` and the `ai`, `@ai-sdk/openai-compatible`, `zod`, `pg`, `@types/pg` packages (unused in stage 1; see commit e9c0cde to restore them). Stage 2 is next.
+
+## Dataset facts (measured in stage 1)
+- Only one dump in `wikimedia/wikipedia`: `20231101.simple/train-00000-of-00001.parquet`. Columns `id`, `url`, `title`, `text` (all VARCHAR). 241,787 articles, ids and titles unique, 267M chars (~67M tokens at 4 chars/token, estimate).
+- Length: p10 141, p50 514, p90 2,069, p99 9,490, max 236,695 chars. 19% of articles are < 200 chars but hold 2% of the text; 0.3% are >= 20k chars and hold 13.5%.
+- Plain text, wiki markup mostly stripped (templates/infoboxes gone, sometimes leaving broken sentences like "1984 (MCMLXXXIV) was ."). Leftovers in a few hundred articles: `{{`, `<ref`, `| ` table rows.
+- Headings are not marked: a short line after a blank line, sometimes with a trailing space (`"\n\nHistory \nThe origin..."`). Most common: References, Other websites, Related pages, History.
+- List items are lines starting with a space. Category names are appended at the end of each article as plain lines ("1987 births", "Communes in Aisne"); stubs often end with a repeat of the title.
+- Boilerplate sections to drop or treat specially in stage 2: References, Other websites, Related pages, Notes, Gallery, Sources.
+- URLs encode spaces as `%20` (`.../wiki/Lionel%20Messi`): use the `url` column as-is for citations.
+- First subset: 10k articles, `ORDER BY hash(id) LIMIT 10000`, excluding disambiguation pages and `List of` pages. Taking 100k from the same order later gives a superset. (`hash()` is DuckDB's; not guaranteed stable across DuckDB versions.)
 
 ## Environment (re-checked 2026-10-21)
 - Node 24.22, npm 11.19 (blocks install scripts by default; tsx works without esbuild's postinstall), Docker 29.8.
@@ -47,10 +59,10 @@ A TypeScript project to practise RAG on a big dataset: an agent that answers que
 
 ## Packages (check installed versions before using)
 - Known to work together: `ai@^5` (pinned; latest on npm is 7) + `@ai-sdk/openai-compatible@^1`, `zod@4`, `pg@8` + `@types/pg`, `ink@6` + `react@19`, dev `typescript@7`, `tsx`, `@biomejs/biome`, `@types/node`.
-- New here, not yet checked: `@duckdb/node-api` or `hyparquet` (Parquet), `@huggingface/hub` (optional, downloads).
+- `@duckdb/node-api@1.5.6-r.2`: `DuckDBInstance.create()` -> `connect()` -> `runAndReadAll(sql)` -> `getRowObjectsJson()` (BIGINTs come back as strings). Native binary arrives as an optional dependency, no install script needed. `tsx -e` compiles to CJS (no top-level await): use a file.
 
 ## Unverified estimates (from memory, check them)
-- Simple English Wikipedia: roughly 250k articles. Full English: about 6-7M articles, tens of millions of chunks.
+- Full English: about 6-7M articles, tens of millions of chunks.
 - Local embedding speed: a few hundred chunks/second; full English would take days.
 - Storage: ~3 KB per 768-dim `vector` (measured: 3,076 bytes), roughly doubled by an HNSW index.
 - Models remember popular facts well and niche facts poorly (Kandpal et al. 2023, Mallen et al. 2023 "PopQA"), not checked.

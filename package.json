@@ -2,7 +2,8 @@
   "name": "wiki-rag",
   "version": "1.0.0",
   "scripts": {
-    "check": "tsx src/check.ts",
+    "download": "mkdir -p data && curl -L --fail -o data/simple.parquet https://huggingface.co/datasets/wikimedia/wikipedia/resolve/main/20231101.simple/train-00000-of-00001.parquet",
+    "explore": "tsx src/explore.ts",
     "typecheck": "tsc",
     "lint": "biome check .",
     "format": "biome check --write ."
@@ -10,15 +11,11 @@
   "type": "module",
   "private": true,
   "dependencies": {
-    "@ai-sdk/openai-compatible": "^1.0.59",
-    "ai": "^5.0.279",
-    "pg": "^8.23.1",
-    "zod": "^4.6.7"
+    "@duckdb/node-api": "^1.5.6-r.2"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.15",
     "@types/node": "^24.19.2",
-    "@types/pg": "^8.23.1",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2"
   }
