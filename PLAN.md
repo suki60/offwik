@@ -39,7 +39,15 @@ A TypeScript project to practise RAG on a big dataset: an agent that answers que
 
 ## Status
 - Stage 0 done (2026-10-21): scaffold, `compose.yaml` (Postgres on host port 5432), `src/config.ts`. `npm run check` verified Postgres 17.11 + pgvector 0.8.7, `qwen3.5:9b` and `nomic-embed-text`.
-- Stage 1 done (2026-10-21): `npm run download` (curl, 157 MB, sha256 matches the LFS oid), `npm run explore` (DuckDB, <1 s). Removed `check.ts`, `config.ts` and the `ai`, `@ai-sdk/openai-compatible`, `zod`, `pg`, `@types/pg` packages (unused in stage 1; see commit e9c0cde to restore them). Stage 2 is next.
+- Stage 1 done (2026-10-21): `npm run download` (curl, 157 MB, sha256 matches the LFS oid), `npm run explore` (DuckDB, <1 s). Removed `check.ts`, `config.ts` and the `ai`, `@ai-sdk/openai-compatible`, `zod`, `pg`, `@types/pg` packages (unused in stage 1; see commit e9c0cde to restore them). 
+- Stage 2 done (2026-10-21): `src/chunker.ts` (pure function), `npm run load` (DuckDB -> chunker -> Postgres, recreates the tables each run), `npm run stats [-- "<title>"]`. Re-added `pg` + `@types/pg`. 10k articles -> 20,150 chunks, loaded in ~3.9 s (~7.8k rows/s, one INSERT per row in one transaction). Stage 3 is next.
+
+## Chunking facts (measured in stage 2, 10k subset)
+- Rules: drop wiki-table lines (`|`, `{|`, `!` at start, or containing `||`); split blocks on blank lines; drop the last block if it is all category-like lines; first block is the intro unless the text starts with a blank line (date/year pages); a heading is a short line (<= 60) with a letter, no end punctuation, no leading space; skip References / Other websites / Related pages / Notes / etc.; pack paragraphs up to 1,200 chars, splitting long ones by line, then sentence, then hard cut. Sections are flat (sub-headings like "Current"/"Former" lose their parent).
+- Each chunk's `content` = `Title › Section\n\n<text>` (intro: just `Title`): that is what stage 3 embeds.
+- Chunks per article: avg 2.02, p50 1, p90 4, p99 13, max 77; 67.5% of articles are a single chunk.
+- Chunk length (prefix included): p10 106, p50 348, p90 987, p99 1,215, max 1,288. 8.6% are < 100 chars (year stubs like "984 was a leap year.", one-line sections).
+- More disambiguation phrasings on the first line ("X can be:", "could mean:", "may be about:", "might mean:"): ~970 extra pages in the full dump, now filtered in `load.ts`. Same `hash(id)` order, so the subset is still a prefix of the bigger one.
 
 ## Dataset facts (measured in stage 1)
 - Only one dump in `wikimedia/wikipedia`: `20231101.simple/train-00000-of-00001.parquet`. Columns `id`, `url`, `title`, `text` (all VARCHAR). 241,787 articles, ids and titles unique, 267M chars (~67M tokens at 4 chars/token, estimate).
