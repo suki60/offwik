@@ -5,6 +5,7 @@
     "download": "mkdir -p data && curl -L --fail -o data/simple.parquet https://huggingface.co/datasets/wikimedia/wikipedia/resolve/main/20231101.simple/train-00000-of-00001.parquet",
     "load": "tsx src/load.ts",
     "stats": "tsx src/stats.ts",
+    "embed": "tsx src/embed.ts",
     "typecheck": "tsc",
     "lint": "biome check .",
     "format": "biome check --write ."
