@@ -5,6 +5,8 @@ import { connect } from "./db.ts";
 
 // Stage 2: read the first N articles of the subset from Parquet, chunk them,
 // and store articles + chunks in Postgres. No embeddings yet (stage 3).
+// Additive: articles already in the database are skipped, so their chunks and
+// embeddings are kept. Loading 60k after 10k only adds the 50k new ones.
 // Usage: npm run load [-- <number of articles>]   (default 10000)
 
 const limit = Number(process.argv[2] ?? 10000);
@@ -32,17 +34,17 @@ console.log(`Read ${articles.length} articles from Parquet`);
 
 const db = await connect();
 
-// Recreate the tables on every run: while chunking rules change, a clean reload is simplest.
-// (From stage 3 on this would also throw away the embeddings.)
+// Never drops anything: tables are created only if they don't exist yet.
+// To start over (e.g. after changing the chunker), drop them by hand:
+//   docker compose exec db psql -U wiki -c "DROP TABLE chunks, articles"
 await db.query(`
   CREATE EXTENSION IF NOT EXISTS vector;
-  DROP TABLE IF EXISTS chunks, articles;
-  CREATE TABLE articles (
+  CREATE TABLE IF NOT EXISTS articles (
     id integer PRIMARY KEY,
     title text NOT NULL UNIQUE,
     url text NOT NULL
   );
-  CREATE TABLE chunks (
+  CREATE TABLE IF NOT EXISTS chunks (
     id serial PRIMARY KEY,
     article_id integer NOT NULL REFERENCES articles (id) ON DELETE CASCADE,
     position integer NOT NULL, -- order of the chunk inside its article
@@ -55,14 +57,19 @@ await db.query(`
 // One INSERT per row, all in one transaction: simple, and one commit at the end
 // instead of one per row. Stage 4 looks at faster bulk loading.
 const start = performance.now();
+let articleCount = 0;
 let chunkCount = 0;
 await db.query("BEGIN");
 for (const { id, url, title, text } of articles) {
-  await db.query("INSERT INTO articles (id, title, url) VALUES ($1, $2, $3)", [
-    id,
-    title,
-    url,
-  ]);
+  // ON CONFLICT DO NOTHING inserts 0 rows when the article is already there:
+  // then its chunks are there too, so skip them.
+  const { rowCount } = await db.query(
+    "INSERT INTO articles (id, title, url) VALUES ($1, $2, $3) ON CONFLICT (id) DO NOTHING",
+    [id, title, url],
+  );
+
+  if (rowCount === 0) continue;
+  articleCount++;
   const chunks = chunkArticle(title, text);
   for (const [position, content] of chunks.entries()) {
     await db.query(
@@ -76,7 +83,8 @@ await db.query("COMMIT");
 const seconds = (performance.now() - start) / 1000;
 
 console.log(
-  `Inserted ${articles.length} articles and ${chunkCount} chunks in ${seconds.toFixed(1)} s ` +
-    `(${Math.round((articles.length + chunkCount) / seconds)} rows/s)`,
+  `Inserted ${articleCount} new articles and ${chunkCount} chunks in ${seconds.toFixed(1)} s ` +
+    `(${Math.round((articleCount + chunkCount) / seconds)} rows/s), ` +
+    `skipped ${articles.length - articleCount} already loaded`,
 );
 await db.end();
