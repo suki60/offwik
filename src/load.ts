@@ -9,17 +9,12 @@ import { connect } from "./db.ts";
 
 const limit = Number(process.argv[2] ?? 10000);
 
-// Same subset as stage 1: fixed pseudo-random order, no disambiguation or "List of" pages.
-// Stage 2 adds more disambiguation phrasings on the first line: "ROM can mean",
-// "Alpine may be:", "Vulcan could mean:", "Tana may be about:" (~970 more pages in the dump).
+// Fixed pseudo-random order (hash of the id), skipping the two easy-to-spot
+// kinds of link-only pages: disambiguation pages and "List of" pages.
 const duck = await (await DuckDBInstance.create()).connect();
 const reader = await duck.runAndReadAll(`
   SELECT id, url, title, text FROM 'data/simple.parquet'
   WHERE title NOT LIKE '%(disambiguation)'
-    AND text NOT LIKE '%may refer to%'
-    AND text NOT LIKE '%may mean:%'
-    AND NOT regexp_matches(text, '^[^\\n]*(can mean|can refer to)')
-    AND NOT regexp_matches(text, '^[^\\n]*\\b(can|could|may|might) (also )?(mean|be|refer to|be about):')
     AND title NOT LIKE 'List of %'
   ORDER BY hash(id)
   LIMIT ${limit}
@@ -51,8 +46,7 @@ await db.query(`
     id serial PRIMARY KEY,
     article_id integer NOT NULL REFERENCES articles (id) ON DELETE CASCADE,
     position integer NOT NULL, -- order of the chunk inside its article
-    section text,              -- NULL for the intro
-    content text NOT NULL,     -- "Title › Section" prefix + text: what gets embedded
+    content text NOT NULL,     -- title + text: what gets embedded
     embedding vector(768),     -- filled in stage 3
     UNIQUE (article_id, position)
   );
@@ -70,10 +64,10 @@ for (const { id, url, title, text } of articles) {
     url,
   ]);
   const chunks = chunkArticle(title, text);
-  for (const [position, chunk] of chunks.entries()) {
+  for (const [position, content] of chunks.entries()) {
     await db.query(
-      "INSERT INTO chunks (article_id, position, section, content) VALUES ($1, $2, $3, $4)",
-      [id, position, chunk.section, chunk.content],
+      "INSERT INTO chunks (article_id, position, content) VALUES ($1, $2, $3)",
+      [id, position, content],
     );
   }
   chunkCount += chunks.length;

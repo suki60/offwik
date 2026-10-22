@@ -9,7 +9,7 @@ const title = process.argv[2];
 
 if (title) {
   const { rows } = await db.query(
-    `SELECT c.position, c.section, length(c.content) AS chars, c.content
+    `SELECT c.position, length(c.content) AS chars, c.content
      FROM chunks c JOIN articles a ON a.id = c.article_id
      WHERE a.title = $1
      ORDER BY c.position`,
@@ -17,9 +17,7 @@ if (title) {
   );
   if (rows.length === 0) console.log(`No chunks for "${title}"`);
   for (const row of rows) {
-    console.log(
-      `\n--- #${row.position} [${row.section ?? "intro"}] ${row.chars} chars`,
-    );
+    console.log(`\n--- #${row.position} ${row.chars} chars`);
     console.log(row.content);
   }
 } else {
@@ -84,19 +82,6 @@ if (title) {
         FROM chunks
         GROUP BY bucket
         ORDER BY bucket
-      `)
-    ).rows,
-  );
-
-  console.log("\n== Most common sections");
-  console.table(
-    (
-      await db.query(`
-        SELECT coalesce(section, '(intro)') AS section, count(*) AS chunks
-        FROM chunks
-        GROUP BY section
-        ORDER BY chunks DESC
-        LIMIT 15
       `)
     ).rows,
   );
