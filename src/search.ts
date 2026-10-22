@@ -79,7 +79,7 @@ for (const [i, { title, url, content, distance }] of results.entries()) {
 const warm = timings.slice(1).sort((a, b) => a - b);
 const median = warm[Math.floor(warm.length / 2)] ?? 0;
 
-// Which database answered: DATABASE_URL picks it (5432 = db, 5433 = db2).
+// Which database answered: DB=db2 picks 5433, otherwise 5432.
 console.log(`Searched ${chunks} chunks on ${db.host}:${db.port}, top ${k}`);
 console.log(`  embed query: ${embedMs.toFixed(0)} ms`);
 

@@ -6,11 +6,27 @@ services:
       POSTGRES_PASSWORD: wiki
       POSTGRES_DB: wiki
     ports:
-      - "5432:5432"
+      - "5430:5432"
     # Default /dev/shm (64 MB) is too small for parallel HNSW builds later.
     shm_size: 1g
     volumes:
       - pgdata:/var/lib/postgresql/data
+  # Second database for the bigger subset (60k articles), on host port 5433.
+  # Select it with DB=db2 (see src/db.ts).
+  db2:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_USER: wiki
+      POSTGRES_PASSWORD: wiki
+      POSTGRES_DB: wiki
+    ports:
+      - "5431:5432"
+    # Default /dev/shm (64 MB) is too small for parallel HNSW builds later.
+    shm_size: 1g
+    # Own volume: two servers must never share one data directory.
+    volumes:
+      - pgdata2:/var/lib/postgresql/data
 
 volumes:
   pgdata:
+  pgdata2:
