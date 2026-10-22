@@ -1,4 +1,5 @@
 import { DuckDBInstance } from "@duckdb/node-api";
+import { z } from "zod";
 import { chunkArticle } from "./chunker.ts";
 import { connect } from "./db.ts";
 
@@ -23,7 +24,15 @@ const reader = await duck.runAndReadAll(`
   ORDER BY hash(id)
   LIMIT ${limit}
 `);
-const articles = reader.getRowObjectsJson();
+// DuckDB rows are typed as generic Json values: validate the shape at runtime
+// and get real types from the schema. id is a VARCHAR in the Parquet file.
+const Article = z.object({
+  id: z.coerce.number().int(),
+  url: z.string(),
+  title: z.string(),
+  text: z.string(),
+});
+const articles = z.array(Article).parse(reader.getRowObjectsJson());
 console.log(`Read ${articles.length} articles from Parquet`);
 
 const db = await connect();
@@ -60,7 +69,7 @@ for (const { id, url, title, text } of articles) {
     title,
     url,
   ]);
-  const chunks = chunkArticle(String(title), String(text));
+  const chunks = chunkArticle(title, text);
   for (const [position, chunk] of chunks.entries()) {
     await db.query(
       "INSERT INTO chunks (article_id, position, section, content) VALUES ($1, $2, $3, $4)",
