@@ -1,5 +1,9 @@
 import pg from "pg";
 
+// count(*) and sum() return bigint, which pg gives back as a string by default
+// (a JS number is only exact up to 2^53). Our counts and ids are far below that.
+pg.types.setTypeParser(pg.types.builtins.INT8, Number);
+
 // Defaults match compose.yaml.
 const databaseUrl =
   process.env.DATABASE_URL ?? "postgres://wiki:wiki@localhost:5432/wiki";

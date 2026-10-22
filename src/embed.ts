@@ -42,9 +42,9 @@ const db = await connect();
 
 const { rows } = await db.query(`
   SELECT
-    (SELECT count(*) FROM articles)::int AS articles,
-    count(*)::int AS chunks,
-    count(*) FILTER (WHERE embedding IS NULL)::int AS todo
+    (SELECT count(*) FROM articles) AS articles,
+    count(*) AS chunks,
+    count(*) FILTER (WHERE embedding IS NULL) AS todo
   FROM chunks
 `);
 const { articles, chunks, todo } = rows[0];
