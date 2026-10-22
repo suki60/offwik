@@ -1,5 +1,5 @@
-import { z } from "zod";
 import { connect } from "./db.ts";
+import { embed } from "./ollama.ts";
 
 // Stage 3: embed every chunk that has no embedding yet, one batch at a time.
 // Resumable by design: each batch is committed on its own, and the next run
@@ -8,32 +8,6 @@ import { connect } from "./db.ts";
 // Usage: npm run embed [-- <batch size>]   (default 64)
 
 const batchSize = Number(process.argv[2] ?? 64);
-
-const ollamaUrl = process.env.OLLAMA_URL ?? "http://localhost:11434/v1";
-
-// Response of the OpenAI-compatible /embeddings endpoint (only the fields we use).
-// `index` says which input each vector belongs to.
-const EmbeddingsResponse = z.object({
-  data: z.array(
-    z.object({ index: z.number().int(), embedding: z.array(z.number()) }),
-  ),
-});
-
-// One HTTP request for the whole batch: `input` takes an array of strings.
-async function embed(texts: string[]): Promise<number[][]> {
-  const response = await fetch(`${ollamaUrl}/embeddings`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ model: "nomic-embed-text", input: texts }),
-  });
-  // fetch only rejects on network errors: HTTP errors have to be checked by hand.
-  if (!response.ok) {
-    throw new Error(`Ollama ${response.status}: ${await response.text()}`);
-  }
-  const { data } = EmbeddingsResponse.parse(await response.json());
-  // Sort by index instead of trusting the order of the array.
-  return data.sort((a, b) => a.index - b.index).map((item) => item.embedding);
-}
 
 // Rows in the full Simple English dump (measured in stage 1), for the estimate.
 const FULL_DATASET_ARTICLES = 241_787;
@@ -63,7 +37,7 @@ while (true) {
   if (rows.length === 0) break;
 
   // nomic-embed-text was trained with task prefixes: documents get
-  // "search_document: ", queries (stage 4) will get "search_query: ".
+  // "search_document: ", queries (search.ts) get "search_query: ".
   // No retries: if a request fails, the script stops and a rerun resumes.
   const embeddings = await embed(
     rows.map((row) => `search_document: ${row.content}`),

@@ -7,7 +7,8 @@
     "embed": "tsx src/embed.ts",
     "typecheck": "tsc",
     "lint": "biome check .",
-    "format": "biome check --write ."
+    "format": "biome check --write .",
+    "search": "tsx src/search.ts"
   },
   "type": "module",
   "private": true,
