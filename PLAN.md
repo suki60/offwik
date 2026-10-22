@@ -41,13 +41,13 @@ A TypeScript project to practise RAG on a big dataset: an agent that answers que
 - Stage 0 done (2026-10-21): scaffold, `compose.yaml` (Postgres on host port 5432), `src/config.ts`. `npm run check` verified Postgres 17.11 + pgvector 0.8.7, `qwen3.5:9b` and `nomic-embed-text`.
 - Stage 1 done (2026-10-21): `npm run download` (curl, 157 MB, sha256 matches the LFS oid), `npm run explore` (DuckDB, <1 s). Removed `check.ts`, `config.ts` and the `ai`, `@ai-sdk/openai-compatible`, `zod`, `pg`, `@types/pg` packages (unused in stage 1; see commit e9c0cde to restore them). 
 - Stage 2 done (2026-10-22): `src/chunker.ts` (pure function), `npm run load` (DuckDB -> Zod -> chunker -> Postgres, recreates the tables each run), `npm run stats [-- "<title>"]`. Re-added `pg`, `@types/pg`, `zod`.
-- Stage 3 done (2026-10-22): `npm run embed [-- <batch size>]` (plain `fetch` to `/v1/embeddings` + Zod, batch 64, no retries, one transaction per batch, resumes from `WHERE embedding IS NULL`). Measured: 10k articles -> 15,351 chunks, ~125 chunks/s (123 s total); full Simple English ~371k chunks, ~0.8 h estimated. Verified: interrupting with SIGINT after 896 of 3,000 left exactly 2,104 to do, the rerun finished them; vectors have norm 1.0. Stage 4 is next.
+- Stage 3 done (2026-10-22): `npm run embed [-- <batch size>]` (plain `fetch` to `/v1/embeddings` + Zod, batch 64, no retries, one transaction per batch, resumes from `WHERE embedding IS NULL`). Measured: 10k articles -> 15,351 chunks, ~125 chunks/s (123 s total); full Simple English ~371k chunks, ~0.8 h estimated. Verified: interrupting with SIGINT after 896 of 3,000 left exactly 2,104 to do, the rerun finished them; vectors have norm 1.0. Removed `src/explore.ts`, `src/stats.ts` and the `stats` script (see commit 033c2da to restore them). Stage 4 is next.
 
 ## Chunking (stage 2)
 - Kept deliberately generic, no Wikipedia-specific rules: split at blank lines, pack paragraphs up to 1,200 chars, hard-cut anything longer, prefix each chunk with the title (`Title\n\n<text>`, what stage 3 embeds). Subset filter: only `(disambiguation)` titles and `List of` pages.
 - Accepted noise: references, categories and table leftovers get embedded; chunks can span topics. Stage 6 evals decide whether any rule is worth adding back.
 - A first, Wikipedia-specific version (heading detection, sections, category/table removal, extra disambiguation regexes) was dropped as too complex. It found: wiki-table lines (`|-`, `||`), date pages starting with a blank line, ~970 extra disambiguation pages ("X could mean:", "may be about:").
-- Numbers for the generic version: not measured yet (run `npm run load && npm run stats`).
+- Numbers for the generic version: not measured yet (`npm run stats` removed in stage 3; restore from commit 033c2da).
 
 ## Dataset facts (measured in stage 1)
 - Only one dump in `wikimedia/wikipedia`: `20231101.simple/train-00000-of-00001.parquet`. Columns `id`, `url`, `title`, `text` (all VARCHAR). 241,787 articles, ids and titles unique, 267M chars (~67M tokens at 4 chars/token, estimate).
