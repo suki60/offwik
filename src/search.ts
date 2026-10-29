@@ -117,7 +117,6 @@ for (const [i, { title, url, content, distance }] of hnsw.results.entries()) {
 console.log(`HNSW plan:\n${hnswPlan}\n`);
 console.log(`Exact plan:\n${exactPlan}\n`);
 
-// Which database answered: DB=db2 picks 5433, otherwise 5432.
 console.log(`Searched ${chunks} chunks on ${db.host}:${db.port}, top ${k}`);
 console.log(`  embed query: ${embedMs.toFixed(0)} ms`);
 

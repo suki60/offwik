@@ -9,11 +9,7 @@
     "load": "tsx src/load.ts",
     "embed": "tsx src/embed.ts",
     "search": "tsx src/search.ts",
-    "index": "tsx src/index.ts",
-    "load:2": "DB=db2 tsx src/load.ts",
-    "embed:2": "DB=db2 tsx src/embed.ts",
-    "search:2": "DB=db2 tsx src/search.ts",
-    "index:2": "DB=db2 tsx src/index.ts"
+    "index": "tsx src/index.ts"
   },
   "type": "module",
   "private": true,
