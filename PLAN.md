@@ -10,7 +10,7 @@ A TypeScript project to practise RAG on a big dataset: an agent that answers que
 
 ## Constraints
 - Node.js + TypeScript only (no Python), run with `tsx`. Biome, 2-space indentation. Zod 4 for validation.
-- Models are local, through Ollama's OpenAI-compatible API (`http://localhost:11434/v1`). Chat: `qwen3.5:9b`. Embeddings: `nomic-embed-text` (768 dimensions, needs `search_document: ` / `search_query: ` prefixes).
+- Models are local, through Ollama's OpenAI-compatible API (`http://localhost:11434/v1`). Chat: `qwen3.5:0.8b` (decided in stage 6: the agent should eventually run on an iPhone; `qwen3.5:9b` stays as a comparison via `CHAT_MODEL`). Embeddings: `nomic-embed-text` (768 dimensions, needs `search_document: ` / `search_query: ` prefixes).
 - Postgres + pgvector in Docker (`pgvector/pgvector:pg17`), plain `pg` client, raw SQL (no ORM).
 - Dataset: Hugging Face `wikimedia/wikipedia` (Parquet files, `title` + `text` per article). Start with the `simple` (Simple English) config; grow only after each step works.
 - Wikipedia text is CC BY-SA: answers must cite the article (title + URL).

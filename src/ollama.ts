@@ -45,7 +45,9 @@ export async function chat(messages: Message[]): Promise<string> {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: "qwen3.5:9b",
+      // The model meant to run on the phone. CHAT_MODEL picks another one to
+      // compare, e.g. CHAT_MODEL=qwen3.5:9b npm run closed-book
+      model: process.env.CHAT_MODEL ?? "qwen3.5:0.8b",
       messages,
       // qwen3.5 thinks before answering by default (a long `reasoning` field).
       // "none" turns that off: checked against Ollama, the reply comes back
