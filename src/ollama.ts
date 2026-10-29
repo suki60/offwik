@@ -1,6 +1,7 @@
 import { z } from "zod";
 
-// Shared by embed.ts (documents) and search.ts (queries).
+// embed() is shared by embed.ts (documents), search.ts and eval.ts (queries).
+// chat() is used by closed-book.ts.
 
 const ollamaUrl = process.env.OLLAMA_URL ?? "http://localhost:11434/v1";
 
@@ -29,4 +30,36 @@ export async function embed(texts: string[]): Promise<number[][]> {
 
   // Sort by index instead of trusting the order of the array.
   return data.sort((a, b) => a.index - b.index).map((item) => item.embedding);
+}
+
+// Response of the OpenAI-compatible /chat/completions endpoint (only the
+// fields we use).
+const ChatResponse = z.object({
+  choices: z.array(z.object({ message: z.object({ content: z.string() }) })),
+});
+
+type Message = { role: "system" | "user" | "assistant"; content: string };
+
+export async function chat(messages: Message[]): Promise<string> {
+  const response = await fetch(`${ollamaUrl}/chat/completions`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "qwen3.5:9b",
+      messages,
+      // qwen3.5 thinks before answering by default (a long `reasoning` field).
+      // "none" turns that off: checked against Ollama, the reply comes back
+      // without `reasoning`.
+      reasoning_effort: "none",
+      // Same question, same answer: makes reruns comparable.
+      temperature: 0,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Ollama ${response.status}: ${await response.text()}`);
+  }
+
+  const { choices } = ChatResponse.parse(await response.json());
+  return choices[0]?.message.content ?? "";
 }
