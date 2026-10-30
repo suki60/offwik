@@ -1,10 +1,9 @@
-import { connect } from "./db.ts";
-import { isCorrect } from "./grade.ts";
-import { chat, embed } from "./ollama.ts";
+import { connect } from "../db.ts";
+import { chat, embed } from "../ollama.ts";
+import { buildMessages, citedPassages, type Passage } from "../rag.ts";
 import { questions } from "./questions.ts";
-import { buildMessages, citedPassages, type Passage } from "./rag.ts";
 
-// Stage 7, step 2: the gold questions with retrieval, graded like
+// Stage 7, step 2: the gold questions with retrieval, graded like stage 6's
 // closed-book.ts (closed book: qwen3.5:0.8b 0/48, qwen3.5:9b 7/48).
 // Per question: retrieve the top K chunks (HNSW, ef_search 1000), let the chat
 // model answer from them, then check three things separately:
@@ -21,7 +20,7 @@ const K = 5;
 const db = await connect();
 await db.query("SELECT set_config('hnsw.ef_search', '1000', false)");
 
-// Same query as search.ts, with the columns the prompt needs.
+// Same query as stage 5's search.ts, with the columns the prompt needs.
 const sql = `
   SELECT a.title, a.url, c.content
   FROM chunks c
@@ -30,6 +29,20 @@ const sql = `
   ORDER BY c.embedding <=> $1::vector
   LIMIT $2
 `;
+
+// Correct if the reply contains one of the expected answers as a whole word,
+// case-insensitive. The lookarounds use Unicode letters/digits, so "Dan"
+// doesn't match "abundant" and "Ölfusá" still matches (\b is ASCII-only).
+function isCorrect(reply: string, answers: string[]) {
+  return answers.some((answer) => {
+    const escaped = answer.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+    return new RegExp(
+      `(?<![\\p{L}\\p{N}])${escaped}(?![\\p{L}\\p{N}])`,
+      "iu",
+    ).test(reply);
+  });
+}
 
 // 48 questions: one embeddings request for all of them.
 const vectors = await embed(

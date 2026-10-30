@@ -1,26 +1,25 @@
 import { DuckDBInstance } from "@duckdb/node-api";
 import { z } from "zod";
+import { connect } from "../db.ts";
 import { chunkArticle } from "./chunker.ts";
-import { connect } from "./db.ts";
 
-// Stage 2: read the first N articles of the subset from Parquet, chunk them,
-// and store articles + chunks in Postgres. No embeddings yet (stage 3).
+// Setup step 2: read every article from Parquet, chunk it, and store
+// articles + chunks in Postgres. No embeddings yet (embed.ts).
 // Additive: articles already in the database are skipped, so their chunks and
-// embeddings are kept. Loading 60k after 10k only adds the 50k new ones.
-// Usage: npm run load [-- <number of articles>]   (default 10000)
+// embeddings are kept. Rerunning setup after a crash doesn't lose work.
+// Expect 238,243 articles and 370,859 chunks.
+// Usage: npm run load
 
-const limit = Number(process.argv[2] ?? 10000);
-
-// Fixed pseudo-random order (hash of the id), skipping the two easy-to-spot
-// kinds of link-only pages: disambiguation pages and "List of" pages.
+// Skips the two easy-to-spot kinds of link-only pages: disambiguation pages
+// and "List of" pages.
 const duck = await (await DuckDBInstance.create()).connect();
+
 const reader = await duck.runAndReadAll(`
   SELECT id, url, title, text FROM 'data/simple.parquet'
   WHERE title NOT LIKE '%(disambiguation)'
     AND title NOT LIKE 'List of %'
-  ORDER BY hash(id)
-  LIMIT ${limit}
 `);
+
 // DuckDB rows are typed as generic Json values: validate the shape at runtime
 // and get real types from the schema. id is a VARCHAR in the Parquet file.
 const Article = z.object({
@@ -29,9 +28,9 @@ const Article = z.object({
   title: z.string(),
   text: z.string(),
 });
+
 const articles = z.array(Article).parse(reader.getRowObjectsJson());
 console.log(`Read ${articles.length} articles from Parquet`);
-
 const db = await connect();
 
 // Never drops anything: tables are created only if they don't exist yet.
@@ -49,15 +48,14 @@ await db.query(`
     article_id integer NOT NULL REFERENCES articles (id) ON DELETE CASCADE,
     position integer NOT NULL, -- order of the chunk inside its article
     content text NOT NULL,     -- title + text: what gets embedded
-    embedding vector(768),     -- filled in stage 3
+    embedding vector(768),     -- filled by embed.ts
     UNIQUE (article_id, position)
   );
 `);
 
-// Stage 4: bulk loading. Before, every article and every chunk was its own
-// INSERT, one round trip each (~8k rows/s). Now each batch of articles takes
-// 2 queries: Postgres turns arrays (one per column) back into rows with unnest().
-// All in one transaction, so one commit at the end.
+// Bulk loading (stage 4): each batch of articles takes 2 queries, Postgres
+// turns arrays (one per column) back into rows with unnest(). All in one
+// transaction, so one commit at the end.
 const BATCH_SIZE = 1000;
 
 const start = performance.now();
@@ -114,8 +112,8 @@ await db.query("COMMIT");
 const seconds = (performance.now() - start) / 1000;
 
 console.log(
-  `Inserted ${articleCount} new articles and ${chunkCount} chunks in ${seconds.toFixed(1)} s ` +
-    `(${Math.round((articleCount + chunkCount) / seconds)} rows/s), ` +
+  `Inserted ${articleCount} new articles and ${chunkCount} chunks in ${seconds.toFixed(1)} s, ` +
     `skipped ${articles.length - articleCount} already loaded`,
 );
+
 await db.end();

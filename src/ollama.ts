@@ -1,9 +1,7 @@
 import { z } from "zod";
 import type { Message } from "./rag.ts";
 
-// embed() is shared by embed.ts (documents), search.ts, eval.ts and
-// rag-eval.ts (queries). chat() is used by closed-book.ts,
-// generate-questions.ts and rag-eval.ts.
+// embed() and chat() are used by rag-eval.ts.
 
 const ollamaUrl = process.env.OLLAMA_URL ?? "http://localhost:11434/v1";
 
@@ -40,22 +38,15 @@ const ChatResponse = z.object({
   choices: z.array(z.object({ message: z.object({ content: z.string() }) })),
 });
 
-// model: defaults to the phone model. CHAT_MODEL picks another one to
-// compare, e.g. CHAT_MODEL=qwen3.5:9b npm run closed-book
-// json: Ollama forces the reply to be valid JSON (checked against Ollama).
-type ChatOptions = { model?: string; json?: boolean };
-
-export async function chat(
-  messages: Message[],
-  { model, json = false }: ChatOptions = {},
-): Promise<string> {
+// The model defaults to the phone model. CHAT_MODEL picks another one to
+// compare, e.g. CHAT_MODEL=qwen3.5:9b npm run rag-eval
+export async function chat(messages: Message[]): Promise<string> {
   const response = await fetch(`${ollamaUrl}/chat/completions`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: model ?? process.env.CHAT_MODEL ?? "qwen3.5:0.8b",
+      model: process.env.CHAT_MODEL ?? "qwen3.5:0.8b",
       messages,
-      response_format: json ? { type: "json_object" } : undefined,
       // qwen3.5 thinks before answering by default (a long `reasoning` field).
       // "none" turns that off: checked against Ollama, the reply comes back
       // without `reasoning`.
