@@ -12,6 +12,7 @@
     "index": "tsx src/index.ts",
     "closed-book": "tsx src/closed-book.ts",
     "eval": "tsx src/eval.ts",
+    "rag-eval": "tsx src/rag-eval.ts",
     "generate-questions": "tsx src/generate-questions.ts"
   },
   "type": "module",

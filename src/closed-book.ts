@@ -1,3 +1,4 @@
+import { isCorrect } from "./grade.ts";
 import { chat } from "./ollama.ts";
 import { questions } from "./questions.ts";
 
@@ -8,20 +9,6 @@ import { questions } from "./questions.ts";
 
 const SYSTEM_PROMPT =
   "Answer in one short sentence. If you are not sure, say that you don't know.";
-
-// Correct if the reply contains one of the expected answers as a whole word,
-// case-insensitive. The lookarounds use Unicode letters/digits, so "Dan"
-// doesn't match "abundant" and "Ölfusá" still matches (\b is ASCII-only).
-function isCorrect(reply: string, answers: string[]) {
-  return answers.some((answer) => {
-    const escaped = answer.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-
-    return new RegExp(
-      `(?<![\\p{L}\\p{N}])${escaped}(?![\\p{L}\\p{N}])`,
-      "iu",
-    ).test(reply);
-  });
-}
 
 const correctTitles: string[] = [];
 

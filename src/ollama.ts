@@ -1,7 +1,9 @@
 import { z } from "zod";
+import type { Message } from "./rag.ts";
 
-// embed() is shared by embed.ts (documents), search.ts and eval.ts (queries).
-// chat() is used by closed-book.ts and generate-questions.ts.
+// embed() is shared by embed.ts (documents), search.ts, eval.ts and
+// rag-eval.ts (queries). chat() is used by closed-book.ts,
+// generate-questions.ts and rag-eval.ts.
 
 const ollamaUrl = process.env.OLLAMA_URL ?? "http://localhost:11434/v1";
 
@@ -37,8 +39,6 @@ export async function embed(texts: string[]): Promise<number[][]> {
 const ChatResponse = z.object({
   choices: z.array(z.object({ message: z.object({ content: z.string() }) })),
 });
-
-type Message = { role: "system" | "user" | "assistant"; content: string };
 
 // model: defaults to the phone model. CHAT_MODEL picks another one to
 // compare, e.g. CHAT_MODEL=qwen3.5:9b npm run closed-book
