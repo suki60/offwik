@@ -6,13 +6,13 @@
     "chunkId": 79042
   },
   {
-    "question": "Which magazine listed Stefanía among its 50 Most Beautiful People?",
+    "question": "What campaign did Stefanía participate in during the 2014 Venezuelan protests?",
     "title": "Stefanía Fernández",
-    "answers": ["People en Español"],
+    "answers": ["Your Voice is Your Power"],
     "chunkId": 241361
   },
   {
-    "question": "Which hospital was Billy Tipton pronounced dead at?",
+    "question": "Where was Billy Tipton pronounced dead?",
     "title": "Billy Tipton",
     "answers": ["Valley General Hospital"],
     "chunkId": 194813
@@ -32,7 +32,7 @@
   {
     "question": "What percentage of aluminium is used for wrought products?",
     "title": "Aluminium alloy",
-    "answers": ["85%"],
+    "answers": ["About 85%"],
     "chunkId": 244750
   },
   {
@@ -48,7 +48,7 @@
     "chunkId": 197854
   },
   {
-    "question": "Which team became the first Asian side to win a FIFA World Cup?",
+    "question": "Which team became the first Asian team to win any FIFA World Cup?",
     "title": "2011 FIFA Women's World Cup",
     "answers": ["Japan"],
     "chunkId": 326929
@@ -62,7 +62,7 @@
   {
     "question": "Which group did the Nawabs of Junagadh belong to?",
     "title": "Junagadh State",
-    "answers": ["Pathan Babi"],
+    "answers": ["Pathan Babi khel tribe"],
     "chunkId": 223141
   },
   {
@@ -96,37 +96,19 @@
     "chunkId": 103060
   },
   {
-    "question": "Which Iranian politician died from COVID-19 in March 2020?",
-    "title": "Deaths in March 2020",
-    "answers": ["Hossein Sheikholeslam"],
-    "chunkId": 185499
-  },
-  {
     "question": "How many visible stars are in the Orion constellation?",
     "title": "Orion (constellation)",
     "answers": ["81"],
     "chunkId": 261129
   },
   {
-    "question": "On which network did the show air?",
-    "title": "Car 54, Where Are You?",
-    "answers": ["NBC"],
-    "chunkId": 201053
-  },
-  {
-    "question": "Who was the first President of India after it became a republic?",
-    "title": "January 26",
-    "answers": ["Rajendra Prasad"],
-    "chunkId": 290162
-  },
-  {
-    "question": "What is the common name of Broussonetia papyrifera?",
+    "question": "What is the paper mulberry also known as?",
     "title": "Paper mulberry",
     "answers": ["tapa cloth tree"],
     "chunkId": 1970
   },
   {
-    "question": "Which city in Belgium uses the telephone area code 015?",
+    "question": "Which city in Belgium uses the area code 015?",
     "title": "Telephone numbers in Belgium",
     "answers": ["Mechelen"],
     "chunkId": 70697
@@ -138,15 +120,9 @@
     "chunkId": 160725
   },
   {
-    "question": "On what date was the square renamed?",
-    "title": "Embassy of Russia, Oslo",
-    "answers": ["March 8, 2022"],
-    "chunkId": 43659
-  },
-  {
-    "question": "In how many seconds did the Tesla Roadster accelerate from zero to sixty?",
+    "question": "In what year did regular production of the Tesla Roadster start?",
     "title": "Tesla, Inc.",
-    "answers": ["3.9"],
+    "answers": ["2008"],
     "chunkId": 83110
   },
   {
@@ -162,16 +138,10 @@
     "chunkId": 360643
   },
   {
-    "question": "What was the name of the wrestler who attacked Jeff Hardy in June 2003?",
+    "question": "When did Parks return to TNA as The Monster Abyss?",
     "title": "Abyss (wrestler)",
-    "answers": ["The Monster Abyss"],
+    "answers": ["June 2003"],
     "chunkId": 18829
-  },
-  {
-    "question": "On what date did Napoleon arrive at Portoferraio?",
-    "title": "Elba",
-    "answers": ["May 3, 1814"],
-    "chunkId": 370140
   },
   {
     "question": "Who established the MOBO Awards in 1996?",
@@ -180,21 +150,21 @@
     "chunkId": 25593
   },
   {
-    "question": "What operating system can True Image create an image of while running?",
+    "question": "What operating systems can True Image image while running?",
     "title": "Acronis True Image",
     "answers": ["Microsoft Windows"],
     "chunkId": 179374
   },
   {
-    "question": "What percentage of the universe is hydrogen?",
+    "question": "What percentage does hydrogen make up of the universe?",
     "title": "Hydrogen",
     "answers": ["74%"],
     "chunkId": 328863
   },
   {
-    "question": "In what year was Billy Bob Thornton born?",
+    "question": "When was Billy Bob Thornton's album Private Radio released?",
     "title": "Billy Bob Thornton",
-    "answers": ["1955"],
+    "answers": ["2001"],
     "chunkId": 336349
   },
   {
@@ -210,33 +180,27 @@
     "chunkId": 263585
   },
   {
-    "question": "Which company created the GX4000 console?",
+    "question": "Which company made the GX4000 console?",
     "title": "GX4000",
     "answers": ["Amstrad"],
     "chunkId": 144487
   },
   {
-    "question": "In which city was Jan Magiera born?",
+    "question": "In which Polish town was Jan Magiera born?",
     "title": "Jan Magiera",
     "answers": ["Jelna"],
     "chunkId": 4612
   },
   {
-    "question": "Who conquered Naples from the French by 1504?",
-    "title": "Ferdinand II of Aragon",
-    "answers": ["Gonzalo Fernández de Córdoba"],
-    "chunkId": 322699
-  },
-  {
-    "question": "In which country is Tubbergen located?",
+    "question": "In which year were about 21,000 people living in Tubbergen?",
     "title": "Tubbergen",
-    "answers": ["the Netherlands"],
+    "answers": ["2021"],
     "chunkId": 233049
   },
   {
-    "question": "How many deaths were validated by the National Disaster Risk Reduction and Management Council?",
+    "question": "In which year did Typhoon Ketsana occur?",
     "title": "Typhoon Vamco",
-    "answers": ["69"],
+    "answers": ["2009"],
     "chunkId": 216979
   },
   {
@@ -246,39 +210,39 @@
     "chunkId": 161001
   },
   {
-    "question": "What does being an outlaw mean for someone regarding the legal system?",
+    "question": "What does being an outlaw mean for a person's ability to use the legal system?",
     "title": "Outlaw",
-    "answers": ["cannot use"],
+    "answers": ["protect himself"],
     "chunkId": 93861
   },
   {
-    "question": "Which theater in Glasgow hosted the musical's premiere in March 2006?",
+    "question": "Who contributed some lyrics to the musical adaptation?",
     "title": "The Wolves in the Walls",
-    "answers": ["Tramway"],
+    "answers": ["Neil Gaiman"],
     "chunkId": 275032
   },
   {
-    "question": "Who developed the statistical mechanics for bosons?",
-    "title": "Bose gas",
-    "answers": ["Satyendra Nath Bose"],
-    "chunkId": 196900
-  },
-  {
-    "question": "What illness caused Jörg Kastendiek's death?",
+    "question": "In what year did Jörg Kastendiek die?",
     "title": "Jörg Kastendiek",
-    "answers": ["lymphoma"],
+    "answers": ["2019"],
     "chunkId": 262970
   },
   {
-    "question": "In which year was the Free Wales Army formed?",
+    "question": "Who covered I Need a Lover for their 1979 album?",
+    "title": "I Need a Lover",
+    "answers": ["Pat Benatar"],
+    "chunkId": 368089
+  },
+  {
+    "question": "Who formed the Free Wales Army?",
     "title": "Free Wales Army",
-    "answers": ["1963"],
+    "answers": ["Julian Cayo-Evans"],
     "chunkId": 273953
   },
   {
-    "question": "How long can an adult Peron's tree frog grow?",
+    "question": "In which Australian state is Peron's tree frog not found?",
     "title": "Peron's tree frog",
-    "answers": ["65 mm"],
+    "answers": ["Victoria"],
     "chunkId": 110698
   },
   {
@@ -288,13 +252,13 @@
     "chunkId": 345002
   },
   {
-    "question": "Who directed the construction of the Monaco Opera House?",
+    "question": "Who directed the building of the Opéra de Monte-Carlo?",
     "title": "Opéra de Monte-Carlo",
     "answers": ["Charles Garnier"],
     "chunkId": 268543
   },
   {
-    "question": "Who created the show Babylon 5?",
+    "question": "Who created the Babylon 5 television series?",
     "title": "Babylon 5",
     "answers": ["J. Michael Straczynski"],
     "chunkId": 30390
@@ -326,14 +290,8 @@
   {
     "question": "Where did Colin Powell die?",
     "title": "Colin Powell",
-    "answers": ["Bethesda"],
+    "answers": ["Bethesda, Maryland"],
     "chunkId": 196139
-  },
-  {
-    "question": "Who wrote the book The Wonderful Wizard of Oz?",
-    "title": "1900",
-    "answers": ["L. Frank Baum"],
-    "chunkId": 346199
   },
   {
     "question": "In which year was the movie Nebraska released?",
@@ -342,58 +300,40 @@
     "chunkId": 33363
   },
   {
-    "question": "On what date did Jinnah join the Imperial Legislative Council?",
+    "question": "When did Muhammad Ali Jinnah join the Imperial Legislative Council?",
     "title": "Muhammad Ali Jinnah",
     "answers": ["25 January 1910"],
     "chunkId": 306909
   },
   {
-    "question": "In which country does this frog live?",
+    "question": "In which country does Phasmahyla cruzi live?",
     "title": "Phasmahyla cruzi",
     "answers": ["Brazil"],
     "chunkId": 149472
   },
   {
-    "question": "What does the word apoplexy mean?",
+    "question": "What does apoplexy mean regarding an internal organ?",
     "title": "Apoplexy",
     "answers": ["bleeding"],
     "chunkId": 233733
   },
   {
-    "question": "Which incident occurred in Zhongli in 1977?",
+    "question": "Which incident occurred in Zhongli District in 1977?",
     "title": "Zhongli District",
     "answers": ["Jungli Incident"],
     "chunkId": 50738
   },
   {
-    "question": "Which language is constitutionally called Manipuri?",
-    "title": "Bengali–Assamese script",
-    "answers": ["Meitei language"],
-    "chunkId": 177295
-  },
-  {
-    "question": "In which city did Charles John Klyberg die?",
+    "question": "In which city did John Klyberg die?",
     "title": "John Klyberg",
     "answers": ["London"],
     "chunkId": 68111
   },
   {
-    "question": "Who originally specified the first three normal forms?",
-    "title": "Database normalisation",
-    "answers": ["Codd"],
-    "chunkId": 189575
-  },
-  {
-    "question": "How old was Freddie Gray when he died?",
+    "question": "On what date did the 2015 Baltimore protests begin?",
     "title": "2015 Baltimore protests",
-    "answers": ["25 years"],
+    "answers": ["April 25, 2015"],
     "chunkId": 185985
-  },
-  {
-    "question": "Who is the character that married Patti?",
-    "title": "London's Burning (TV series)",
-    "answers": ["Pearce"],
-    "chunkId": 45311
   },
   {
     "question": "In which city did Joshua N. Goldberg die?",
@@ -402,16 +342,10 @@
     "chunkId": 11610
   },
   {
-    "question": "In what year was the public tender held for the monument's construction?",
+    "question": "In which city is the Monumento Tortura Nunca Mais located?",
     "title": "Monumento Tortura Nunca Mais",
-    "answers": ["1988"],
+    "answers": ["Recife"],
     "chunkId": 314098
-  },
-  {
-    "question": "Which president lived in Abilene?",
-    "title": "Kansas",
-    "answers": ["Eisenhower"],
-    "chunkId": 356607
   },
   {
     "question": "What is the name of Metcalfe County's county seat?",
@@ -420,37 +354,25 @@
     "chunkId": 190006
   },
   {
-    "question": "What kind of birds do flushing spaniels help hunters shoot?",
+    "question": "What type of dog is used to hunt birds that hide in high grass?",
     "title": "Hunting dog",
-    "answers": ["high grass"],
+    "answers": ["Flushing spaniels"],
     "chunkId": 275429
   },
   {
-    "question": "In what year was Cúc Phương made into a forest reserve?",
+    "question": "In which year was Cúc Phương made a forest reserve?",
     "title": "Cúc Phương National Park",
     "answers": ["1960"],
     "chunkId": 335897
   },
   {
-    "question": "Which land plants were long considered a natural group but are now known to be separate lineages?",
-    "title": "Evolutionary grade",
-    "answers": ["bryophytes"],
-    "chunkId": 34761
-  },
-  {
-    "question": "Who was the English painter born in 1827?",
-    "title": "September 7",
-    "answers": ["William Holman Hunt"],
-    "chunkId": 245614
-  },
-  {
-    "question": "What year did TV Tropes begin?",
+    "question": "What year did TV Tropes start?",
     "title": "TV Tropes",
     "answers": ["2004"],
     "chunkId": 240956
   },
   {
-    "question": "In what year was Drew Carey born?",
+    "question": "When was Drew Carey born?",
     "title": "Drew Carey",
     "answers": ["May 23, 1958"],
     "chunkId": 190209
@@ -468,15 +390,15 @@
     "chunkId": 94197
   },
   {
-    "question": "Which company distributed the 1931 film Daughter of the Dragon?",
+    "question": "Which company distributed the 1931 movie Daughter of the Dragon?",
     "title": "Daughter of the Dragon",
     "answers": ["Paramount Pictures"],
     "chunkId": 177911
   },
   {
-    "question": "In which country is Bhilomar located?",
+    "question": "In which district is Bhilomar located?",
     "title": "Bhilomar",
-    "answers": ["Pakistan"],
+    "answers": ["Chakwal District"],
     "chunkId": 207459
   },
   {
@@ -486,57 +408,21 @@
     "chunkId": 228336
   },
   {
-    "question": "Which tribe originally inhabited the peninsula?",
-    "title": "Palos Verdes",
-    "answers": ["Tongva"],
-    "chunkId": 16774
-  },
-  {
-    "question": "On which television channel did the show run?",
-    "title": "Parks and Recreation",
-    "answers": ["NBC"],
-    "chunkId": 346129
-  },
-  {
-    "question": "In what year did the House of Stuart return to power in England?",
-    "title": "Restoration",
-    "answers": ["1660"],
-    "chunkId": 169163
-  },
-  {
-    "question": "Who played the character Jack Russell in the TV special?",
-    "title": "Werewolf by Night",
-    "answers": ["Gael García Bernal"],
-    "chunkId": 38411
-  },
-  {
-    "question": "What year did the United Nations hold a special talk called the World Summit on the Information Society?",
-    "title": "Digital rights",
-    "answers": ["2003"],
-    "chunkId": 284744
-  },
-  {
-    "question": "Which river borders Bimmen to the north?",
+    "question": "How many people live in Bimmen?",
     "title": "Bimmen",
-    "answers": ["Rhine River"],
+    "answers": ["170"],
     "chunkId": 261097
   },
   {
-    "question": "Which American sprinter died in May 2021 after suffering a stroke?",
-    "title": "Deaths in May 2021",
-    "answers": ["Lee Evans"],
-    "chunkId": 347922
-  },
-  {
-    "question": "When was the comune of Cellio con Breia created?",
+    "question": "When was Cellio con Breia created?",
     "title": "Cellio con Breia",
     "answers": ["1 January 2018"],
     "chunkId": 193527
   },
   {
-    "question": "What color is calcium sulfide?",
+    "question": "What is the chemical formula for calcium sulfide?",
     "title": "Calcium sulfide",
-    "answers": ["white"],
+    "answers": ["CAS"],
     "chunkId": 80448
   },
   {
@@ -546,43 +432,25 @@
     "chunkId": 308910
   },
   {
-    "question": "What does the term classified information generally refer to?",
-    "title": "Sensitive information",
-    "answers": ["special security classification"],
-    "chunkId": 263651
-  },
-  {
-    "question": "How much money did the movie earn in the United States?",
-    "title": "City of Joy (movie)",
-    "answers": ["$14.7 million"],
-    "chunkId": 28423
-  },
-  {
     "question": "In which city was Pete Seeger born?",
     "title": "Pete Seeger",
     "answers": ["Manhattan"],
     "chunkId": 101071
   },
   {
-    "question": "Which religion states that Satan is only an angel and not the Devil?",
+    "question": "Which religion states that there are several devils who support Satan?",
     "title": "Devil",
-    "answers": ["Judaism"],
+    "answers": ["Islam"],
     "chunkId": 96197
   },
   {
-    "question": "Who published a view on the shape of the Earth in the year 13?",
-    "title": "13",
-    "answers": ["Strabo"],
-    "chunkId": 368376
-  },
-  {
-    "question": "Which button brings up the BIOS setup screen on most computers?",
+    "question": "Which button brings up the BIOS setup screen?",
     "title": "BIOS",
-    "answers": ["delete"],
+    "answers": ["delete or F12"],
     "chunkId": 133573
   },
   {
-    "question": "Who voiced the character of King Louie in the 1967 Disney movie?",
+    "question": "Who played the character of King Louie in the 1967 Disney movie?",
     "title": "King Louie",
     "answers": ["Louis Prima"],
     "chunkId": 198764
@@ -592,12 +460,6 @@
     "title": "Jos van Kemenade",
     "answers": ["Amsterdam"],
     "chunkId": 162816
-  },
-  {
-    "question": "Which city was declared the capital of the Kingdom of Italy in 1871?",
-    "title": "January 26",
-    "answers": ["Rome"],
-    "chunkId": 290160
   },
   {
     "question": "Who founded YouTube in 2005?",
@@ -618,46 +480,40 @@
     "chunkId": 354049
   },
   {
-    "question": "What is the capital city of the Pomeranian Voivodeship?",
+    "question": "What city serves as the capital of the Pomeranian Voivodeship?",
     "title": "Pomeranian Voivodeship",
     "answers": ["Gdańsk"],
     "chunkId": 225687
   },
   {
-    "question": "In what year did sexual reassignment surgery become legal in Turkey?",
+    "question": "When did legal sex change become possible in Turkey?",
     "title": "LGBT rights in Turkey",
-    "answers": ["1988"],
+    "answers": ["since 1988"],
     "chunkId": 178694
   },
   {
-    "question": "In which city was Ric Drasin born?",
+    "question": "Where was Ric Drasin born?",
     "title": "Ric Drasin",
     "answers": ["Bakersfield"],
     "chunkId": 250407
   },
   {
-    "question": "What nationality was Kurt Weber?",
+    "question": "In what year was Kurt Weber born?",
     "title": "Kurt Weber",
-    "answers": ["Polish"],
+    "answers": ["1928"],
     "chunkId": 75365
   },
   {
-    "question": "Which city-state was never part of Prussia?",
+    "question": "Which city-states were never part of Prussia?",
     "title": "Prussia",
     "answers": ["Oldenburg"],
     "chunkId": 184694
   },
   {
-    "question": "In which year was Vauxhall founded?",
+    "question": "In which city was Vauxhall founded?",
     "title": "Vauxhall Motors",
-    "answers": ["1903"],
+    "answers": ["London"],
     "chunkId": 194734
-  },
-  {
-    "question": "Who was the writer and diplomat named Philippe de Comines?",
-    "title": "Comines",
-    "answers": ["Philippe de Commines"],
-    "chunkId": 4897
   },
   {
     "question": "How old was Daniel Noboa when he became president?",
@@ -666,40 +522,22 @@
     "chunkId": 299842
   },
   {
-    "question": "In which year was the album Mucho Barato released?",
-    "title": "Mucho Barato",
-    "answers": ["1997"],
-    "chunkId": 115838
-  },
-  {
-    "question": "Who plays the character known as Batman in this movie?",
-    "title": "Justice League (movie)",
-    "answers": ["Ben Affleck"],
-    "chunkId": 246120
-  },
-  {
     "question": "How many arrondissements are in the Charente department?",
     "title": "Arrondissements of the Charente department",
     "answers": ["3"],
     "chunkId": 12977
   },
   {
-    "question": "Which team won the Croatian First Football League in 1992?",
+    "question": "Which team won the league in 1992?",
     "title": "Croatian First Football League",
     "answers": ["Hajduk Split"],
     "chunkId": 67565
   },
   {
-    "question": "Which city did dubstep originate in?",
+    "question": "Which city did dubstep start in?",
     "title": "Dubstep",
     "answers": ["South London"],
     "chunkId": 294861
-  },
-  {
-    "question": "Who was the American politician who became the sixth Governor of Iowa?",
-    "title": "February 3",
-    "answers": ["Ansel Briggs"],
-    "chunkId": 82970
   },
   {
     "question": "When did Joseph Kasa-Vubu die?",
@@ -708,43 +546,31 @@
     "chunkId": 105516
   },
   {
-    "question": "What illness caused the death of Robbe De Hert?",
-    "title": "Deaths in August 2020",
-    "answers": ["diabetes"],
-    "chunkId": 21461
-  },
-  {
-    "question": "Who was the president of Deportivo Saprissa?",
+    "question": "When was Deportivo Saprissa founded?",
     "title": "Deportivo Saprissa",
-    "answers": ["Juani Saprissa Aymá"],
+    "answers": ["July 16, 1935"],
     "chunkId": 304055
   },
   {
-    "question": "Who is the Nash equilibrium named after?",
+    "question": "Who was the Nash equilibrium named after?",
     "title": "Nash equilibrium",
     "answers": ["John Forbes Nash Jr."],
     "chunkId": 305050
   },
   {
-    "question": "Which countries give Freedom of the City?",
-    "title": "Freedom of the City",
-    "answers": ["Australia"],
-    "chunkId": 254718
-  },
-  {
-    "question": "Who managed the Japan national team when Junichi Inamoto made his debut?",
+    "question": "Who managed the Japan national team when Junichi Inamoto debuted?",
     "title": "Junichi Inamoto",
     "answers": ["Philippe Troussier"],
     "chunkId": 120104
   },
   {
-    "question": "In what year was the Barrington Club founded?",
+    "question": "When was the Barrington Club founded?",
     "title": "Barrington Tops National Park",
     "answers": ["1948"],
     "chunkId": 103855
   },
   {
-    "question": "Which air force used the Fairey Hendon?",
+    "question": "Which air force used only the Fairey Hendon?",
     "title": "Fairey Hendon",
     "answers": ["the RAF"],
     "chunkId": 45930
@@ -762,9 +588,9 @@
     "chunkId": 28462
   },
   {
-    "question": "Who was the seventh President of the Italian Republic?",
+    "question": "In which year did Alessandro Pertini serve as President?",
     "title": "Alessandro Pertini",
-    "answers": ["Pertini"],
+    "answers": ["1978"],
     "chunkId": 137916
   },
   {
@@ -774,28 +600,10 @@
     "chunkId": 153006
   },
   {
-    "question": "In which hills does this frog live?",
-    "title": "Rhacophorus pseudomalabaricus",
-    "answers": ["Anaimalai Hills"],
-    "chunkId": 240688
-  },
-  {
-    "question": "Which airport is partially located inside Le Grand-Saconnex?",
+    "question": "Which airport is partially inside Le Grand-Saconnex?",
     "title": "Le Grand-Saconnex",
     "answers": ["Geneva International Airport"],
     "chunkId": 306484
-  },
-  {
-    "question": "Which German explorer studied flightless beetles in Algeria?",
-    "title": "Evolution",
-    "answers": ["Moritz Wagner"],
-    "chunkId": 292039
-  },
-  {
-    "question": "Which artist did Thicke want the song to sound like?",
-    "title": "Blurred Lines (song)",
-    "answers": ["Marvin Gaye"],
-    "chunkId": 270314
   },
   {
     "question": "How many people lived in Wilkes County according to the 2020 census?",
@@ -804,39 +612,27 @@
     "chunkId": 111752
   },
   {
-    "question": "How many children were in each grade in the United States in 2001?",
-    "title": "Middle school",
-    "answers": ["3.6 million"],
-    "chunkId": 40372
-  },
-  {
-    "question": "Which protagonist appears in Fire Emblem: Path of Radiance?",
+    "question": "Who are the protagonists of Fire Emblem: The Sacred Stones?",
     "title": "Fire Emblem",
-    "answers": ["Ike"],
+    "answers": ["Eirika and Ephraim"],
     "chunkId": 241916
   },
   {
-    "question": "What two things is Gadabay known for?",
+    "question": "What famous company worked in Gadabay during the Tsarist era?",
     "title": "Gadabay District",
-    "answers": ["potatoes and its gold fields"],
+    "answers": ["Siemens"],
     "chunkId": 256663
   },
   {
-    "question": "What does the border of the coat of arms consist of?",
-    "title": "Coat of arms of Belize",
-    "answers": ["twenty-five leaves"],
-    "chunkId": 50409
-  },
-  {
-    "question": "In which year was Edit Sipos born?",
+    "question": "In which city was Edit Sipos born?",
     "title": "Edit Sipos",
-    "answers": ["1975"],
+    "answers": ["Szentes"],
     "chunkId": 311853
   },
   {
-    "question": "In which city was Barthold Fles born?",
+    "question": "In which year did Barthold Fles leave for the United States?",
     "title": "Barthold Fles",
-    "answers": ["Amsterdam"],
+    "answers": ["1923"],
     "chunkId": 106261
   },
   {
@@ -846,7 +642,7 @@
     "chunkId": 80696
   },
   {
-    "question": "In which French town did François-Mathurin Gourvès die?",
+    "question": "In which French city did François-Mathurin Gourvès die?",
     "title": "François-Mathurin Gourvès",
     "answers": ["Saint-Anne-d'Auray"],
     "chunkId": 189259
@@ -858,15 +654,9 @@
     "chunkId": 135241
   },
   {
-    "question": "Who was the Hungarian physicist born in 1908?",
-    "title": "January 15",
-    "answers": ["Edward Teller"],
-    "chunkId": 216941
-  },
-  {
-    "question": "In which year did Shaun White win his first Olympic gold medal?",
+    "question": "Where was Shaun White born?",
     "title": "Shaun White",
-    "answers": ["2006"],
+    "answers": ["San Diego"],
     "chunkId": 52181
   },
   {
@@ -876,45 +666,27 @@
     "chunkId": 354622
   },
   {
-    "question": "What branch of mathematics studies homotopies?",
-    "title": "Homotopy",
-    "answers": ["Algebraic Topology"],
-    "chunkId": 177914
-  },
-  {
-    "question": "Who plays the Bulgarian assassin Krilencu?",
-    "title": "From Russia with Love",
-    "answers": ["Fred Haggerty"],
-    "chunkId": 235103
-  },
-  {
-    "question": "Which actor wore Delon sunglasses in a 1986 movie?",
+    "question": "In what year did Alain Delon return to France after leaving the navy?",
     "title": "Alain Delon",
-    "answers": ["Chow Yun-fat"],
+    "answers": ["1956"],
     "chunkId": 86057
   },
   {
-    "question": "Who created the sketch comedy series Incredible Crew?",
+    "question": "Who created the Incredible Crew?",
     "title": "Incredible Crew",
     "answers": ["Nick Cannon"],
     "chunkId": 10013
   },
   {
-    "question": "How many people lived in Exira according to the 2010 census?",
+    "question": "How many people lived in Exira during the 2010 census?",
     "title": "Exira, Iowa",
     "answers": ["840"],
     "chunkId": 17684
   },
   {
-    "question": "Who produced the song A Boy Named Sue?",
-    "title": "Shel Silverstein",
-    "answers": ["Chet Atkins"],
-    "chunkId": 143479
-  },
-  {
-    "question": "In which city was Bettino Craxi born?",
+    "question": "When did Bettino Craxi die?",
     "title": "Bettino Craxi",
-    "answers": ["Milan"],
+    "answers": ["19 January 2000"],
     "chunkId": 211341
   },
   {
@@ -924,34 +696,34 @@
     "chunkId": 352011
   },
   {
-    "question": "In which year was Doñana National Park named a nature reserve?",
+    "question": "Who directed the 2004 movie Retrograde?",
+    "title": "Retrograde (2004 movie)",
+    "answers": ["Christopher Kulikowski"],
+    "chunkId": 72696
+  },
+  {
+    "question": "In what year was Doñana National Park named a nature reserve?",
     "title": "Doñana National Park",
     "answers": ["1969"],
     "chunkId": 278607
   },
   {
-    "question": "In which city was Nelson Shanks's famous portrait of Diana first shown?",
+    "question": "In which year was Nelson Shanks born?",
     "title": "Nelson Shanks",
-    "answers": ["New York City"],
+    "answers": ["1937"],
     "chunkId": 20435
   },
   {
-    "question": "How far away is the star HD 210271 from Earth?",
+    "question": "How far away is HD 210271 from Earth?",
     "title": "HD 210271",
     "answers": ["212 light-years"],
     "chunkId": 63799
   },
   {
-    "question": "In which year was Joseph Siravo born?",
+    "question": "In what year was Joseph Siravo born?",
     "title": "Joseph Siravo",
     "answers": ["1955"],
     "chunkId": 58842
-  },
-  {
-    "question": "What substance can be added to the mixture to provide potassium?",
-    "title": "Diarrhea",
-    "answers": ["banana"],
-    "chunkId": 49988
   },
   {
     "question": "What rating did the Motion Picture Association of America give Orgazmo?",
@@ -960,31 +732,25 @@
     "chunkId": 281179
   },
   {
-    "question": "Who is famous for disproving spontaneous generation?",
-    "title": "Medical microbiology",
-    "answers": ["Louis Pasteur"],
-    "chunkId": 352656
-  },
-  {
-    "question": "Who directed the 2002 movie High Crimes?",
+    "question": "Who directed the movie High Crimes?",
     "title": "High Crimes",
     "answers": ["Carl Franklin"],
     "chunkId": 135822
   },
   {
-    "question": "In which year did Rocky Johnson retire from wrestling?",
+    "question": "In which year did Rocky Johnson retire?",
     "title": "Rocky Johnson",
     "answers": ["1991"],
     "chunkId": 334773
   },
   {
-    "question": "What type of bond does alpha cleavage break?",
+    "question": "What does alpha cleavage refer to in organic chemistry?",
     "title": "Alpha cleavage",
-    "answers": ["carbon-carbon"],
+    "answers": ["breaking the carbon-carbon bond"],
     "chunkId": 189330
   },
   {
-    "question": "When did regular broadcasts begin on this Norwegian television channel?",
+    "question": "When did regular broadcasts start on NRK1?",
     "title": "NRK1",
     "answers": ["20 August 1960"],
     "chunkId": 262791
@@ -996,22 +762,16 @@
     "chunkId": 247314
   },
   {
-    "question": "When did Jim Yong Kim announce he would step down?",
+    "question": "When did Jim Yong Kim become World Bank President?",
     "title": "Jim Yong Kim",
-    "answers": ["January 7, 2019"],
+    "answers": ["2012"],
     "chunkId": 145104
   },
   {
-    "question": "In which year did Leopold Facco make his debut for the Austria national football team?",
+    "question": "In which year did Leopold Facco make his national team debut?",
     "title": "Leopold Facco",
     "answers": ["1930"],
     "chunkId": 220012
-  },
-  {
-    "question": "What year was the album De Mysteriis Dom Sathanas released?",
-    "title": "Mayhem (band)",
-    "answers": ["1994"],
-    "chunkId": 147231
   },
   {
     "question": "On what date was the 2006 Canadian federal election held?",
@@ -1020,63 +780,45 @@
     "chunkId": 138594
   },
   {
-    "question": "In which year was Jonathan Frakes born?",
+    "question": "In what year was Jonathan Frakes born?",
     "title": "Jonathan Frakes",
-    "answers": ["August 19, 1952"],
+    "answers": ["1952"],
     "chunkId": 367518
   },
   {
-    "question": "In which year was Valente Rodriguez born?",
+    "question": "In which city was Valente Rodriguez born?",
     "title": "Valente Rodriguez",
-    "answers": ["February 14, 1964"],
+    "answers": ["Edcouch"],
     "chunkId": 318323
   },
   {
-    "question": "In what year was Noami Santos born?",
+    "question": "When was Noami Santos born?",
     "title": "Noami Santos",
-    "answers": ["1993"],
+    "answers": ["29 November 1993"],
     "chunkId": 83476
   },
   {
-    "question": "Who was the leader of the Labor party during the 2010 election?",
-    "title": "2010 South Australian state election",
-    "answers": ["Mike Rann"],
-    "chunkId": 122268
-  },
-  {
-    "question": "In which year was the singer Mika born?",
+    "question": "In which year was Mika born?",
     "title": "Mika (singer)",
     "answers": ["1983"],
     "chunkId": 324054
   },
   {
-    "question": "Which British literary editor died in January 2019?",
-    "title": "Deaths in January 2019",
-    "answers": ["Diana Athill"],
-    "chunkId": 32353
-  },
-  {
-    "question": "Who donated the estate where Greenville was settled?",
+    "question": "When was Greenville incorporated as a city?",
     "title": "Greenville, Kentucky",
-    "answers": ["William Campbell"],
+    "answers": ["1848"],
     "chunkId": 287537
   },
   {
-    "question": "Who succeeded Terry Branstad as the Governor of Iowa?",
+    "question": "Who succeeded Terry Branstad as Governor of Iowa?",
     "title": "Terry Branstad",
     "answers": ["Kim Reynolds"],
     "chunkId": 80909
   },
   {
-    "question": "What book describes Christ's 1000 year reign?",
-    "title": "Second Coming",
-    "answers": ["Book of Revelation"],
-    "chunkId": 232898
-  },
-  {
     "question": "Which nuclear accident happened in 1986?",
     "title": "Nuclear accident",
-    "answers": ["Chernobyl"],
+    "answers": ["Chernobyl disaster"],
     "chunkId": 139343
   },
   {
@@ -1086,16 +828,10 @@
     "chunkId": 361377
   },
   {
-    "question": "What condition must the distances between nodes meet for Dijkstra's algorithm?",
+    "question": "What does Dijkstra's algorithm find?",
     "title": "Dijkstra's algorithm",
-    "answers": ["zero or more"],
+    "answers": ["shortest paths"],
     "chunkId": 18363
-  },
-  {
-    "question": "How many ECTS credits does the Centralien Programme account for?",
-    "title": "École Centrale Paris",
-    "answers": ["300"],
-    "chunkId": 257988
   },
   {
     "question": "In which city did Gustav Holst die?",
@@ -1104,49 +840,31 @@
     "chunkId": 322541
   },
   {
-    "question": "Who is the head of the Department of Psychophysiology of Cognitive Processes?",
-    "title": "SWPS University",
-    "answers": ["Małgorzata Kossut"],
-    "chunkId": 272405
-  },
-  {
     "question": "Who made America's Army?",
     "title": "America's Army",
     "answers": ["MOVES Institute"],
     "chunkId": 161727
   },
   {
-    "question": "In which year did Claude Confortès die?",
+    "question": "In which suburb of Paris was Claude Confortès born?",
     "title": "Claude Confortès",
-    "answers": ["2016"],
+    "answers": ["Saint-Maur-des-Fossés"],
     "chunkId": 68638
   },
   {
-    "question": "Which character did Charles Martinet voice in the game Jet Set Radio Future?",
+    "question": "Which character did Charles Martinet voice in the 2001 game Star Wars: Galactic Battlegrounds?",
     "title": "Charles Martinet",
-    "answers": ["Gouji Rokkaku"],
+    "answers": ["AT-AT driver"],
     "chunkId": 287995
   },
   {
-    "question": "Where is the Lord Howe Island stick insect found now?",
-    "title": "Dryococelus australis",
-    "answers": ["Ball's Pyramid"],
-    "chunkId": 11205
-  },
-  {
-    "question": "In which month and year did Dominik Thalhammer become the youngest Bundesliga coach?",
+    "question": "When was Dominik Thalhammer born?",
     "title": "Dominik Thalhammer",
-    "answers": ["September 2004"],
+    "answers": ["2 October 1970"],
     "chunkId": 81788
   },
   {
-    "question": "Which Bangladeshi politician died in June 2020 from COVID-19?",
-    "title": "Deaths in June 2020",
-    "answers": ["Sheikh Md Abdullah"],
-    "chunkId": 117939
-  },
-  {
-    "question": "What river flows through the town of Höxter?",
+    "question": "What river is the town of Höxter located on?",
     "title": "Höxter",
     "answers": ["river Weser"],
     "chunkId": 360170
@@ -1158,25 +876,13 @@
     "chunkId": 74911
   },
   {
-    "question": "Which actor played the IRS worker Harold Crick?",
+    "question": "Who directed the 2006 movie Stranger than Fiction?",
     "title": "Stranger than Fiction (2006 movie)",
-    "answers": ["Will Ferrell"],
+    "answers": ["Marc Forster"],
     "chunkId": 352056
   },
   {
-    "question": "Who was the 15th President of the United States who died in 1868?",
-    "title": "June 1",
-    "answers": ["James Buchanan"],
-    "chunkId": 206213
-  },
-  {
-    "question": "Who wrote The Age of Reason in 1795?",
-    "title": "Timeline of Christianity",
-    "answers": ["Thomas Paine"],
-    "chunkId": 49802
-  },
-  {
-    "question": "How many people lived in Arlington according to the 2000 census?",
+    "question": "How many people lived in Arlington in 2000?",
     "title": "Arlington, Kentucky",
     "answers": ["395"],
     "chunkId": 267619
@@ -1190,20 +896,8 @@
   {
     "question": "Where did Carlos Morales Troncoso die?",
     "title": "Carlos Morales Troncoso",
-    "answers": ["Houston"],
+    "answers": ["Houston, Texas"],
     "chunkId": 90555
-  },
-  {
-    "question": "What year did Coca-Cola and Pepsico release reduced-calorie sodas?",
-    "title": "Diet soft drink",
-    "answers": ["2004"],
-    "chunkId": 227091
-  },
-  {
-    "question": "Which three countries formed the Triple Entente alliance?",
-    "title": "Triple Entente",
-    "answers": ["United Kingdom"],
-    "chunkId": 198002
   },
   {
     "question": "How many kilometers of blood vessels are in an adult human body?",
@@ -1212,9 +906,9 @@
     "chunkId": 361947
   },
   {
-    "question": "What is the name of the day when the American stock market crashed in 1929?",
+    "question": "On what date did the American stock market crash?",
     "title": "Stock exchange",
-    "answers": ["Black Tuesday"],
+    "answers": ["October 29, 1929"],
     "chunkId": 75958
   },
   {
@@ -1224,22 +918,16 @@
     "chunkId": 77843
   },
   {
-    "question": "Who directed the 1969 Japanese Tokusatsu movie?",
+    "question": "Who directed the 1969 movie Yokai Monsters: Along With Ghosts?",
     "title": "Yokai Monsters: Along With Ghosts",
     "answers": ["Yoshiyuki Kuroda"],
     "chunkId": 184779
   },
   {
-    "question": "Who is the commander-in-chief of Albania's military?",
+    "question": "Who is the head of state in Albania?",
     "title": "President of Albania",
     "answers": ["the president"],
     "chunkId": 43290
-  },
-  {
-    "question": "What old name did Bahrain have for eight centuries?",
-    "title": "Awal",
-    "answers": ["Awal"],
-    "chunkId": 66507
   },
   {
     "question": "In which city did James Hilton die?",
@@ -1248,21 +936,9 @@
     "chunkId": 108942
   },
   {
-    "question": "Who was the Canadian drummer of Rush who died in 2020?",
-    "title": "January 7",
-    "answers": ["Neil Peart"],
-    "chunkId": 299462
-  },
-  {
-    "question": "In which district is Hazrat Sardar Qasim Khan Abbasi's shrine located?",
-    "title": "Dhund (tribe)",
-    "answers": ["Bagh Azad Kashmir"],
-    "chunkId": 250501
-  },
-  {
-    "question": "Which company developed Gran Turismo 2?",
+    "question": "In what year was Gran Turismo 2 published?",
     "title": "Gran Turismo 2",
-    "answers": ["Polyphony Digital"],
+    "answers": ["1999"],
     "chunkId": 278809
   },
   {
@@ -1272,9 +948,9 @@
     "chunkId": 219756
   },
   {
-    "question": "What illness caused K. R. Mohanan's death?",
+    "question": "In what year did K. R. Mohanan die?",
     "title": "K. R. Mohanan",
-    "answers": ["stomach cancer"],
+    "answers": ["2017"],
     "chunkId": 331032
   },
   {
@@ -1284,25 +960,19 @@
     "chunkId": 103458
   },
   {
-    "question": "When did Josef Bertalan play his only match for the Austrian national team?",
+    "question": "When was Josef Bertalan born?",
     "title": "Josef Bertalan",
-    "answers": ["1 May 1960"],
+    "answers": ["29 September 1934"],
     "chunkId": 159292
   },
   {
-    "question": "Which corporation provides the main transport service in Chathanthara?",
+    "question": "What language is native to Chathanthara?",
     "title": "Chathanthara",
-    "answers": ["Kerala State Road Transport Corporation"],
+    "answers": ["Malayalam"],
     "chunkId": 301749
   },
   {
-    "question": "In which constellation did the neutron star collision occur?",
-    "title": "Gravitational wave",
-    "answers": ["Hydra"],
-    "chunkId": 337526
-  },
-  {
-    "question": "What classification is Mari Amimoto in wheelchair basketball?",
+    "question": "What classification is Mari Amimoto?",
     "title": "Mari Amimoto",
     "answers": ["4.5"],
     "chunkId": 75179
@@ -1314,31 +984,13 @@
     "chunkId": 328246
   },
   {
-    "question": "Who won the award for the movie Inception in 2010?",
-    "title": "BAFTA Award for Best Sound",
-    "answers": ["Richard King"],
-    "chunkId": 192950
-  },
-  {
-    "question": "In what year did Robert Kincaid visit Madison County?",
+    "question": "What year did Robert Kincaid visit Madison County?",
     "title": "The Bridges of Madison County",
     "answers": ["1965"],
     "chunkId": 65380
   },
   {
-    "question": "Which non-living thing pollinates maize?",
-    "title": "Pollination",
-    "answers": ["wind"],
-    "chunkId": 279648
-  },
-  {
-    "question": "Which company replaced saccharin in Tab with NutraSweet?",
-    "title": "Diet soft drink",
-    "answers": ["Coca-Cola"],
-    "chunkId": 227087
-  },
-  {
-    "question": "When did Arun Manilal Gandhi marry his wife Sunanda?",
+    "question": "In what year did Arun Manilal Gandhi marry nurse Sunanda?",
     "title": "Arun Manilal Gandhi",
     "answers": ["1957"],
     "chunkId": 314501
@@ -1368,12 +1020,6 @@
     "chunkId": 324494
   },
   {
-    "question": "What city is Kollywood named after?",
-    "title": "Kollywood",
-    "answers": ["Kathmandu"],
-    "chunkId": 291783
-  },
-  {
     "question": "In which year did William Currey receive the Victoria Cross for Australia?",
     "title": "Victoria Cross for Australia",
     "answers": ["1918"],
@@ -1386,13 +1032,13 @@
     "chunkId": 244909
   },
   {
-    "question": "What type of birds are nuthatches classified as?",
+    "question": "In which hemisphere do nuthatches live?",
     "title": "Nuthatch",
-    "answers": ["passerine birds"],
+    "answers": ["Northern Hemisphere"],
     "chunkId": 149017
   },
   {
-    "question": "Who composed the original version of The Elements of Style?",
+    "question": "Who composed the original Elements of Style in 1918?",
     "title": "The Elements of Style",
     "answers": ["William Strunk Jr."],
     "chunkId": 75684
@@ -1404,40 +1050,22 @@
     "chunkId": 266563
   },
   {
-    "question": "What are the four numbers that divide evenly into fifteen?",
-    "title": "15 (number)",
-    "answers": ["1, 3, 5, and 15"],
-    "chunkId": 274514
-  },
-  {
-    "question": "Who composed the anthem Blest Pair of Sirens?",
+    "question": "Who composed Blest Pair of Sirens for the choir?",
     "title": "Bach Choir",
     "answers": ["Hubert Parry"],
     "chunkId": 286304
   },
   {
-    "question": "What ancient Greek text was used in secondary schools?",
+    "question": "Which university offered higher education in the Byzantine Empire?",
     "title": "Byzantine Greeks",
-    "answers": ["the Iliad"],
+    "answers": ["University of Constantinople"],
     "chunkId": 288008
   },
   {
-    "question": "In what year was the US Republican Party founded?",
-    "title": "March 20",
-    "answers": ["1854"],
-    "chunkId": 75849
-  },
-  {
-    "question": "In which town is the council for South Somerset located?",
+    "question": "Where is the council for South Somerset based?",
     "title": "South Somerset",
-    "answers": ["Yeovil"],
+    "answers": ["in the town of Yeovil"],
     "chunkId": 345892
-  },
-  {
-    "question": "Who is the Canadian ice hockey player born in 1987?",
-    "title": "August 7",
-    "answers": ["Sidney Crosby"],
-    "chunkId": 187350
   },
   {
     "question": "How many people lived in Cromer in 2001?",
@@ -1476,9 +1104,9 @@
     "chunkId": 328687
   },
   {
-    "question": "Who served as United States Secretary of Health, Education, and Welfare from 1977 through 1979?",
+    "question": "When was Joseph Anthony Califano Jr. born?",
     "title": "Joseph A. Califano Jr.",
-    "answers": ["Joseph Califano"],
+    "answers": ["May 15, 1931"],
     "chunkId": 188175
   },
   {
@@ -1486,12 +1114,6 @@
     "title": "Gelug",
     "answers": ["Je Tsongkhapa"],
     "chunkId": 317929
-  },
-  {
-    "question": "Until what date was the Special Economic Zone extended?",
-    "title": "Magadan Oblast",
-    "answers": ["December 31, 2025"],
-    "chunkId": 343125
   },
   {
     "question": "In which year did Idi Amin die?",
@@ -1512,21 +1134,15 @@
     "chunkId": 12880
   },
   {
-    "question": "Who became the head of the group in July 2023?",
+    "question": "Who became the head of IONIS Education Group in July 2023?",
     "title": "IONIS Education Group",
     "answers": ["Charline Avenel"],
     "chunkId": 333722
   },
   {
-    "question": "Who directed the 1997 movie called The Apostle?",
-    "title": "Apostle",
-    "answers": ["Robert Duvall"],
-    "chunkId": 200370
-  },
-  {
-    "question": "In what year was the British Rail Class 310 introduced?",
+    "question": "Where were the Class 310 trains constructed?",
     "title": "British Rail Class 310",
-    "answers": ["1966"],
+    "answers": ["Derby Carriage and Wagon Works"],
     "chunkId": 281571
   },
   {
@@ -1542,21 +1158,21 @@
     "chunkId": 30979
   },
   {
-    "question": "In which country did Krautrock originate?",
+    "question": "In which country was Krautrock born?",
     "title": "Krautrock",
     "answers": ["Germany"],
     "chunkId": 198744
   },
   {
-    "question": "Who manufactured the M61 Vulcan initially?",
+    "question": "Who originally manufactured the M61 Vulcan?",
     "title": "M61 Vulcan",
     "answers": ["General Electric"],
     "chunkId": 343761
   },
   {
-    "question": "In which country does the limestone small tree frog live?",
+    "question": "In which province does the Romerus calcarius live?",
     "title": "Romerus calcarius",
-    "answers": ["Vietnam"],
+    "answers": ["Hai Phong Province"],
     "chunkId": 301641
   },
   {
@@ -1566,9 +1182,9 @@
     "chunkId": 361701
   },
   {
-    "question": "In which year did Dürer return to Venice for his second visit?",
+    "question": "In which year did Dürer create the Praying Hands?",
     "title": "Albrecht Dürer",
-    "answers": ["1506"],
+    "answers": ["1508"],
     "chunkId": 17382
   },
   {
@@ -1584,13 +1200,7 @@
     "chunkId": 300332
   },
   {
-    "question": "Who built the Church of El Sagrario?",
-    "title": "Ecuador",
-    "answers": ["Bernardo de Legarda"],
-    "chunkId": 364214
-  },
-  {
-    "question": "In which country did researchers observe chimpanzees killing seven neighboring males?",
+    "question": "In which country did researchers observe chimpanzees killing seven neighbors?",
     "title": "Chimpanzee",
     "answers": ["Tanzania"],
     "chunkId": 149050
@@ -1602,39 +1212,39 @@
     "chunkId": 128421
   },
   {
-    "question": "In what year did Czechs reach a population of 65,000 in Ukraine?",
+    "question": "How many Czechs lived in Ukraine by 1900?",
     "title": "Czechs in Ukraine",
-    "answers": ["1870"],
+    "answers": ["65,000"],
     "chunkId": 265470
   },
   {
-    "question": "What instrument is sometimes wrongly called a barrel organ?",
+    "question": "In which county is Linköping Municipality located?",
+    "title": "Linköping Municipality",
+    "answers": ["Östergötland County"],
+    "chunkId": 109904
+  },
+  {
+    "question": "What instrument is the barrel organ sometimes wrongly called?",
     "title": "Barrel organ",
     "answers": ["hurdy gurdy"],
     "chunkId": 334674
   },
   {
-    "question": "What are the smaller numbers called when a composite number is taken apart?",
-    "title": "Factorization",
-    "answers": ["factors"],
-    "chunkId": 182409
-  },
-  {
-    "question": "What is the Norman word for a small forest or pasture bordered by hedges?",
+    "question": "Which two towns are in the area called Bocage Normandy?",
     "title": "Bocage",
-    "answers": ["bocage"],
+    "answers": ["Saint-Lô and Vire"],
     "chunkId": 335653
   },
   {
-    "question": "Which Philippine island is Quezon City located on?",
+    "question": "On which island is Quezon City located?",
     "title": "Quezon City",
     "answers": ["Luzon"],
     "chunkId": 44984
   },
   {
-    "question": "Who gave the 1986 State of the Union address?",
+    "question": "Who delivered the Democratic Party response?",
     "title": "1986 State of the Union Address",
-    "answers": ["Ronald Reagan"],
+    "answers": ["George Mitchell"],
     "chunkId": 64467
   },
   {
@@ -1644,34 +1254,16 @@
     "chunkId": 71254
   },
   {
-    "question": "On what date was Britney Spears' song Work Bitch released?",
+    "question": "On what date was Work Bitch released?",
     "title": "Work Bitch",
     "answers": ["September 16, 2013"],
     "chunkId": 9491
   },
   {
-    "question": "Who wrote the book Nineteen Eighty-Four?",
-    "title": "Science fiction",
-    "answers": ["George Orwell"],
-    "chunkId": 240580
-  },
-  {
-    "question": "What is Jablonec nad Nisou known for producing?",
+    "question": "How many people live in Jablonec nad Nisou?",
     "title": "Jablonec nad Nisou",
-    "answers": ["glass and jewelry"],
+    "answers": ["46,000"],
     "chunkId": 332586
-  },
-  {
-    "question": "What effect does an HCL use to conduct electricity at lower voltage?",
-    "title": "Hollow-cathode lamp",
-    "answers": ["hollow cathode"],
-    "chunkId": 321031
-  },
-  {
-    "question": "Who did Randy Orton challenge to a No Holds Barred match?",
-    "title": "The Legacy (professional wrestling)",
-    "answers": ["McMahon"],
-    "chunkId": 64558
   },
   {
     "question": "In which city was Michael Sheen born?",
@@ -1680,28 +1272,16 @@
     "chunkId": 73238
   },
   {
-    "question": "What is the name of the funicular that goes from the banks of the Aare to the Federal Building?",
-    "title": "Bern",
-    "answers": ["Marzilibahn"],
-    "chunkId": 163545
-  },
-  {
-    "question": "In which city was the pact signed?",
+    "question": "Where was the pact signed in October 1937?",
     "title": "Jinnah-Sikandar Pact",
     "answers": ["Lucknow"],
     "chunkId": 129229
   },
   {
-    "question": "In which year was Rebecca Thomas born?",
+    "question": "When was Rebecca Thomas born?",
     "title": "Rebecca Thomas",
-    "answers": ["1991"],
+    "answers": ["17 September 1991"],
     "chunkId": 61941
-  },
-  {
-    "question": "Who was the German engineer who died in 1988?",
-    "title": "October 9",
-    "answers": ["Felix Wankel"],
-    "chunkId": 100688
   },
   {
     "question": "What is the Chinese name for Père David's deer?",
@@ -1716,39 +1296,33 @@
     "chunkId": 362812
   },
   {
-    "question": "Who is the publisher after whom the library is also known?",
+    "question": "Who is the Petrucci Music Library named after?",
     "title": "International Music Score Library Project",
     "answers": ["Ottaviano Petrucci"],
     "chunkId": 292143
   },
   {
-    "question": "Which river flows into Hudson Bay?",
-    "title": "Pacific Northwest",
-    "answers": ["Mackenzie River"],
-    "chunkId": 363
-  },
-  {
-    "question": "How many times is the US-Mexico border crossed each year?",
+    "question": "How many times is the border crossed each year?",
     "title": "Mexico–United States border",
     "answers": ["three hundred fifty million"],
     "chunkId": 262706
   },
   {
-    "question": "Who first used informal variants of Bayesian networks to analyze trial evidence?",
+    "question": "Who first used informal variants of Bayesian networks in 1913?",
     "title": "Bayesian network",
     "answers": ["John Henry Wigmore"],
     "chunkId": 276595
   },
   {
-    "question": "In what year was the city of McFarland founded?",
+    "question": "In what year was McFarland founded?",
     "title": "McFarland, California",
     "answers": ["1909"],
     "chunkId": 99201
   },
   {
-    "question": "How many people lived in Ponta Delgada as of 2021?",
+    "question": "In which year did 67,287 people live in Ponta Delgada?",
     "title": "Ponta Delgada",
-    "answers": ["67,287"],
+    "answers": ["2021"],
     "chunkId": 260942
   },
   {
@@ -1758,7 +1332,7 @@
     "chunkId": 335991
   },
   {
-    "question": "In which year was the painting A Visit to the Nursery created?",
+    "question": "In what year was A Visit to the Nursery painted?",
     "title": "A Visit to the Nursery",
     "answers": ["1775"],
     "chunkId": 344836
@@ -1776,27 +1350,453 @@
     "chunkId": 276096
   },
   {
-    "question": "When do United States presidential primaries usually take place?",
-    "title": "United States presidential primary",
-    "answers": ["late-January"],
-    "chunkId": 8206
-  },
-  {
     "question": "When did the Northern line become fully automated?",
     "title": "Northern line",
     "answers": ["1 June 2014"],
     "chunkId": 51459
   },
   {
-    "question": "How long does it take to walk from the bazar to the fort?",
-    "title": "Hunza Valley",
-    "answers": ["20 mins"],
-    "chunkId": 64698
+    "question": "When was Yoshie Kasajima born?",
+    "title": "Yoshie Kasajima",
+    "answers": ["May 12, 1975"],
+    "chunkId": 192260
   },
   {
-    "question": "On which network did the show Saved by the Bell air?",
-    "title": "Dennis Haskins",
-    "answers": ["NBC"],
-    "chunkId": 102591
+    "question": "What type of interval exists between C and D?",
+    "title": "Interval (music)",
+    "answers": ["major 2nd"],
+    "chunkId": 96912
+  },
+  {
+    "question": "Who released the cartoon Let's Stick Together?",
+    "title": "Let's Stick Together (cartoon)",
+    "answers": ["Walt Disney Productions"],
+    "chunkId": 8878
+  },
+  {
+    "question": "Which country originated East Asian calligraphy?",
+    "title": "East Asian calligraphy",
+    "answers": ["China"],
+    "chunkId": 354915
+  },
+  {
+    "question": "What was Rio Linda's population in 2020?",
+    "title": "Rio Linda, California",
+    "answers": ["15,944"],
+    "chunkId": 262367
+  },
+  {
+    "question": "How far is Morrinsville from Hamilton?",
+    "title": "Morrinsville",
+    "answers": ["33 kilometres"],
+    "chunkId": 123267
+  },
+  {
+    "question": "When did Jamie Vardy make his international debut for England?",
+    "title": "Jamie Vardy",
+    "answers": ["7th June"],
+    "chunkId": 144724
+  },
+  {
+    "question": "In what year did Leszek Drogosz win a bronze medal?",
+    "title": "Leszek Drogosz",
+    "answers": ["1960"],
+    "chunkId": 284879
+  },
+  {
+    "question": "How many people lived in Barumini as of 2016?",
+    "title": "Barumini",
+    "answers": ["1,276"],
+    "chunkId": 221978
+  },
+  {
+    "question": "Where did Olavo de Carvalho die?",
+    "title": "Olavo de Carvalho",
+    "answers": ["Richmond"],
+    "chunkId": 300494
+  },
+  {
+    "question": "How many wins did the Warriors have in their historic season?",
+    "title": "2015–16 Golden State Warriors season",
+    "answers": ["73"],
+    "chunkId": 248483
+  },
+  {
+    "question": "When was Gary Talley born?",
+    "title": "Gary Talley",
+    "answers": ["August 17 1947"],
+    "chunkId": 319561
+  },
+  {
+    "question": "Who directed The Fox and the Hound?",
+    "title": "The Fox and the Hound",
+    "answers": ["Ted Berman"],
+    "chunkId": 312627
+  },
+  {
+    "question": "Who mathematically described the memristor in 1971?",
+    "title": "Memristor",
+    "answers": ["Professor Leon Chua"],
+    "chunkId": 247349
+  },
+  {
+    "question": "When was Marvin Kalb born?",
+    "title": "Marvin Kalb",
+    "answers": ["June 9, 1930"],
+    "chunkId": 12223
+  },
+  {
+    "question": "What was Princeton's population in 2010?",
+    "title": "Princeton, West Virginia",
+    "answers": ["6,432"],
+    "chunkId": 223345
+  },
+  {
+    "question": "Who formed the band Opeth in 1990?",
+    "title": "Opeth",
+    "answers": ["David Isberg"],
+    "chunkId": 347848
+  },
+  {
+    "question": "Which American organs might have a fifth manual called the Bombarde?",
+    "title": "Pipe organ",
+    "answers": ["American organs"],
+    "chunkId": 314622
+  },
+  {
+    "question": "Where is the municipality of Halbemond located?",
+    "title": "Halbemond",
+    "answers": ["Lower Saxony"],
+    "chunkId": 356750
+  },
+  {
+    "question": "What age does a developmental disability start?",
+    "title": "Developmental disability",
+    "answers": ["very young"],
+    "chunkId": 227909
+  },
+  {
+    "question": "In what year did Train release their seventh album?",
+    "title": "Train (band)",
+    "answers": ["2012"],
+    "chunkId": 268223
+  },
+  {
+    "question": "How many people lived in Green Lake during the 2010 census?",
+    "title": "Green Lake, Wisconsin",
+    "answers": ["960"],
+    "chunkId": 33364
+  },
+  {
+    "question": "In which month and year was Boyhood released?",
+    "title": "Boyhood (movie)",
+    "answers": ["July 2014"],
+    "chunkId": 280493
+  },
+  {
+    "question": "What animals are included in poultry?",
+    "title": "Animal husbandry",
+    "answers": ["chickens, turkeys, geese and ducks"],
+    "chunkId": 172861
+  },
+  {
+    "question": "In what year was John Ratcliffe executed by the Pamunkey?",
+    "title": "John Ratcliffe (governor)",
+    "answers": ["1609"],
+    "chunkId": 31074
+  },
+  {
+    "question": "At what age did Emperor Yōmei die?",
+    "title": "Emperor Yōmei",
+    "answers": ["69"],
+    "chunkId": 272048
+  },
+  {
+    "question": "In which regions is sled dog racing most popular?",
+    "title": "Sled dog racing",
+    "answers": ["Arctic regions"],
+    "chunkId": 214224
+  },
+  {
+    "question": "How far away is Fomalhaut b from Earth?",
+    "title": "Fomalhaut b",
+    "answers": ["25 light years"],
+    "chunkId": 200302
+  },
+  {
+    "question": "When was the British Broadcasting Company formed?",
+    "title": "British Broadcasting Company",
+    "answers": ["18 October 1922"],
+    "chunkId": 61365
+  },
+  {
+    "question": "When did the tradition of Germanic heroic legend mostly start?",
+    "title": "Germanic heroic legend",
+    "answers": ["4th-6th centuries AD"],
+    "chunkId": 182934
+  },
+  {
+    "question": "Where was John Watts born?",
+    "title": "John Watts (Grenadian politician)",
+    "answers": ["St. Patrick"],
+    "chunkId": 26801
+  },
+  {
+    "question": "In what year was Uncle Ben introduced in a Marvel Comics story?",
+    "title": "Uncle Ben",
+    "answers": ["1962"],
+    "chunkId": 208801
+  },
+  {
+    "question": "Who voices the character Boo?",
+    "title": "Boo (character)",
+    "answers": ["Sanae Susaki"],
+    "chunkId": 90045
+  },
+  {
+    "question": "What direction do the mountain chains in the Dominican Republic run?",
+    "title": "Geography of the Dominican Republic",
+    "answers": ["northwest-southeast"],
+    "chunkId": 211897
+  },
+  {
+    "question": "When was the name Oread chosen for the hill?",
+    "title": "Mount Oread",
+    "answers": ["1866"],
+    "chunkId": 313112
+  },
+  {
+    "question": "In what year did José María Minella make his official debut for Argentina?",
+    "title": "José María Minella",
+    "answers": ["1935"],
+    "chunkId": 11980
+  },
+  {
+    "question": "In what year did Sigur Rós release their first album Von?",
+    "title": "Sigur Rós",
+    "answers": ["1997"],
+    "chunkId": 174534
+  },
+  {
+    "question": "Which company produced the show Clone High?",
+    "title": "Clone High",
+    "answers": ["Nelvana"],
+    "chunkId": 368041
+  },
+  {
+    "question": "Which team did Hiroshi Matsuda play for in 1992?",
+    "title": "Hiroshi Matsuda",
+    "answers": ["Sanfrecce Hiroshima"],
+    "chunkId": 144057
+  },
+  {
+    "question": "What does objectivity believe reality exists outside of?",
+    "title": "Objectivity (philosophy)",
+    "answers": ["the human mind"],
+    "chunkId": 189662
+  },
+  {
+    "question": "What was the ancient capital city of Wakasa Province?",
+    "title": "Wakasa Province",
+    "answers": ["Obama"],
+    "chunkId": 251320
+  },
+  {
+    "question": "In which city was Bob Solinger born?",
+    "title": "Bob Solinger",
+    "answers": ["Star City"],
+    "chunkId": 58071
+  },
+  {
+    "question": "What is the maximum weight for low birth weight in pounds?",
+    "title": "Birth weight",
+    "answers": ["5.5 pounds"],
+    "chunkId": 250569
+  },
+  {
+    "question": "Which Australian hard rock band released the song Let's Get It Up?",
+    "title": "Let's Get It Up",
+    "answers": ["AC/DC"],
+    "chunkId": 123467
+  },
+  {
+    "question": "When did Tramlink begin operation?",
+    "title": "Tramlink",
+    "answers": ["May 2000"],
+    "chunkId": 62767
+  },
+  {
+    "question": "Which song by Guns N' Roses was excluded from Appetite for Destruction to keep only one ballad?",
+    "title": "Appetite for Destruction",
+    "answers": ["November Rain"],
+    "chunkId": 183945
+  },
+  {
+    "question": "How many species are in the Iridaceae family?",
+    "title": "Iridaceae",
+    "answers": ["1,500"],
+    "chunkId": 151688
+  },
+  {
+    "question": "Who wrote The Stinky Cheese Man and Other Fairly Stupid Tales?",
+    "title": "The Stinky Cheese Man and Other Fairly Stupid Tales",
+    "answers": ["Jon Scieszka"],
+    "chunkId": 320748
+  },
+  {
+    "question": "Where was Kossi Koudagba born?",
+    "title": "Kossi Koudagba",
+    "answers": ["Davié, Togo"],
+    "chunkId": 110298
+  },
+  {
+    "question": "In which province is Scicli located?",
+    "title": "Scicli",
+    "answers": ["Ragusa"],
+    "chunkId": 367348
+  },
+  {
+    "question": "In what year was the movie Quell and Co. released?",
+    "title": "Quell and Co.",
+    "answers": ["1982"],
+    "chunkId": 47166
+  },
+  {
+    "question": "In which year was Delphine Gibson born?",
+    "title": "Delphine Gibson",
+    "answers": ["1903"],
+    "chunkId": 179047
+  },
+  {
+    "question": "When did new versions of the Lagerordnung become effective for all camps?",
+    "title": "Lagerordnung",
+    "answers": ["January 1, 1934"],
+    "chunkId": 303929
+  },
+  {
+    "question": "In which city was Mike Havenaar born?",
+    "title": "Mike Havenaar",
+    "answers": ["Hiroshima"],
+    "chunkId": 160285
+  },
+  {
+    "question": "When was Thomas P. O'Neill III born?",
+    "title": "Thomas P. O'Neill III",
+    "answers": ["September 20, 1944"],
+    "chunkId": 47547
+  },
+  {
+    "question": "What is the population of Salisbury according to the 2010 Census?",
+    "title": "Salisbury, North Carolina",
+    "answers": ["33,663"],
+    "chunkId": 321949
+  },
+  {
+    "question": "What is the capital city of Guangdong?",
+    "title": "Guangdong",
+    "answers": ["Guangzhou"],
+    "chunkId": 285678
+  },
+  {
+    "question": "Where was Bob Knight born?",
+    "title": "Bob Knight",
+    "answers": ["Massillon, Ohio"],
+    "chunkId": 363959
+  },
+  {
+    "question": "What is the maximum number of instruments in a chamber music group?",
+    "title": "Chamber music",
+    "answers": ["nine"],
+    "chunkId": 86632
+  },
+  {
+    "question": "When was Adrian Fenty born?",
+    "title": "Adrian Fenty",
+    "answers": ["December 6, 1970"],
+    "chunkId": 206155
+  },
+  {
+    "question": "What is the maximum length of a bull shark?",
+    "title": "Bull shark",
+    "answers": ["11.5 feet"],
+    "chunkId": 23907
+  },
+  {
+    "question": "On what date did Student of the Year 2 release?",
+    "title": "Student of the Year 2",
+    "answers": ["May 10, 2019"],
+    "chunkId": 275651
+  },
+  {
+    "question": "What event caused farmers in the Great Plains to suffer greatly?",
+    "title": "Great Depression",
+    "answers": ["Dust Bowl"],
+    "chunkId": 243571
+  },
+  {
+    "question": "Who received the From Hell letter?",
+    "title": "From Hell letter",
+    "answers": ["George Lusk"],
+    "chunkId": 128174
+  },
+  {
+    "question": "Which sea borders the west coast of Kerala?",
+    "title": "Kerala",
+    "answers": ["Arabian Sea"],
+    "chunkId": 272366
+  },
+  {
+    "question": "Where did Mark Miller die?",
+    "title": "Mark Miller (actor)",
+    "answers": ["Santa Monica"],
+    "chunkId": 75439
+  },
+  {
+    "question": "Which country uses UTC+08:00 besides Brunei and China?",
+    "title": "UTC+08:00",
+    "answers": ["Hong Kong"],
+    "chunkId": 281512
+  },
+  {
+    "question": "In which century does the name Micula date back to?",
+    "title": "Micula (surname)",
+    "answers": ["11th century"],
+    "chunkId": 74219
+  },
+  {
+    "question": "In which city was Jeff Carson born?",
+    "title": "Jeff Carson",
+    "answers": ["Tulsa"],
+    "chunkId": 221719
+  },
+  {
+    "question": "Where was Rabbi Friedman born?",
+    "title": "Yisrael Moshe Friedman",
+    "answers": ["New York City"],
+    "chunkId": 340246
+  },
+  {
+    "question": "Which American metalcore band released The Crusade?",
+    "title": "The Crusade (album)",
+    "answers": ["Trivium"],
+    "chunkId": 52208
+  },
+  {
+    "question": "Who directed the 2001 Canadian action thriller movie Hidden Agenda?",
+    "title": "Hidden Agenda (2001 movie)",
+    "answers": ["Marc S. Grenier"],
+    "chunkId": 60907
+  },
+  {
+    "question": "What causes behavioural responses in animals?",
+    "title": "Behavioural responses to stress in animals",
+    "answers": ["Physiological changes"],
+    "chunkId": 235607
+  },
+  {
+    "question": "In which city is JYP Entertainment located?",
+    "title": "JYP Entertainment",
+    "answers": ["Seoul"],
+    "chunkId": 359689
   }
 ]

@@ -11,7 +11,8 @@ import { questions as goldQuestions } from "./questions.ts";
 // 1. Exact search: article-level recall@k (did any of the top k chunks come
 //    from the expected article?), with a 95% range.
 // 2. ef_search sweep: how close HNSW gets to exact search (share of the exact
-//    top 10 chunks it also returns), article recall@10 and latency.
+//    top 10 chunks it also returns, share of the articles exact search found
+//    that it finds too), article recall@10 and latency.
 // 3. The questions exact search misses: what came back instead.
 // Usage: npm run eval
 
@@ -21,7 +22,8 @@ const MAX_K = 20;
 // The sweep compares top 10s. ef_search also caps how many rows one HNSW scan
 // returns, so every value here must be >= 10.
 const SWEEP_K = 10;
-const EF_SEARCH_VALUES = [10, 20, 40, 80, 200, 400];
+// 1000 is pgvector's maximum (checked: 1001 is rejected).
+const EF_SEARCH_VALUES = [10, 20, 40, 80, 200, 400, 800, 1000];
 
 // Same batch size as embed.ts: one request per 64 questions.
 const EMBED_BATCH_SIZE = 64;
@@ -154,8 +156,17 @@ async function evaluate(name: string, questions: EvalQuestion[]) {
   // pass at the default ef_search keeps that cost out of the sweep.
   await db.query("RESET hnsw.ef_search");
   await runAll(vectors, SWEEP_K);
+  // Questions whose article exact search finds in the top 10: the most HNSW
+  // can find. "of exact" = share of these HNSW finds too. Bad labels make
+  // both searches miss, so they drop out of this comparison.
+  const exactFound = questions.flatMap((question, i) => {
+    const rank = articleRank(exact.hits[i] ?? [], question.title);
+    return rank !== null && rank <= SWEEP_K ? [i] : [];
+  });
+
   console.log(`HNSW vs exact, top ${SWEEP_K}:`);
-  console.log("  ef_search  chunks found  recall@10  median latency");
+
+  console.log("  ef_search  chunks found  recall@10  of exact  median latency");
 
   for (const efSearch of EF_SEARCH_VALUES) {
     await db.query("SELECT set_config('hnsw.ef_search', $1, false)", [
@@ -178,13 +189,20 @@ async function evaluate(name: string, questions: EvalQuestion[]) {
 
     const chunkRecall = overlap / (SWEEP_K * questions.length);
 
+    const hnswFound = exactFound.filter((i) => {
+      const rank = articleRank(hits[i] ?? [], questions[i]?.title ?? "");
+      return rank !== null && rank <= SWEEP_K;
+    });
+
+    const ofExact = hnswFound.length / exactFound.length;
+
     console.log(
-      `  ${String(efSearch).padStart(9)}  ${chunkRecall.toFixed(3).padStart(12)}  ${recallAt(questions, hits, SWEEP_K).toFixed(2).padStart(9)}  ${median(timings).toFixed(1).padStart(11)} ms`,
+      `  ${String(efSearch).padStart(9)}  ${chunkRecall.toFixed(3).padStart(12)}  ${recallAt(questions, hits, SWEEP_K).toFixed(2).padStart(9)}  ${ofExact.toFixed(2).padStart(8)}  ${median(timings).toFixed(1).padStart(11)} ms`,
     );
   }
 
   console.log(
-    `  ${"exact".padStart(9)}  ${"1.000".padStart(12)}  ${recallAt(questions, exact.hits, SWEEP_K).toFixed(2).padStart(9)}  ${median(exact.timings).toFixed(1).padStart(11)} ms\n`,
+    `  ${"exact".padStart(9)}  ${"1.000".padStart(12)}  ${recallAt(questions, exact.hits, SWEEP_K).toFixed(2).padStart(9)}  ${"1.00".padStart(8)}  ${median(exact.timings).toFixed(1).padStart(11)} ms\n`,
   );
 
   // Misses: where the expected article ranks in the exact top 20 (or "-" if
