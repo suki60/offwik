@@ -13,19 +13,43 @@ export type Passage = { title: string; url: string; content: string };
 // "https://simple.wikipedia.org/wiki/Loachapoka%2C%20Alabama" letter by letter
 // can garble it, while "[2]" is hard to get wrong. Code turns the number back
 // into a title + URL (citedPassages below).
-// The rule shows a full example reply: with only "like [2]", qwen3.5:0.8b
-// replied with just "[1]" in 23 of 48 questions (rag-eval, stage 7).
 const SYSTEM_PROMPT = `You answer questions using only the numbered passages the user gives you.
 Rules:
 - Answer in one short sentence.
-- End your answer with the number of the passage you used, for example: "The town was founded in 1850 [2]."
+- End your answer with the number of the passage you used in square brackets.
 - If the passages do not contain the answer, reply exactly: I don't know.`;
 
-export function buildMessages(
-  question: string,
-  passages: Passage[],
-): Message[] {
-  // Drop the "Title\n\n" prefix: the title is already on the [n] line.
+// Few-shot example, sent as an earlier user/assistant turn (stage 7 rag-eval
+// with qwen3.5:0.8b):
+// - Rule only ("like [2]"): 23 of 48 replies were just "[1]", 19/48 correct.
+// - Example reply inside the rule: 36/48, but 6 replies copied it word for
+//   word ("The town was founded in 1850 [2].").
+// As a past exchange about other, made-up content, the model sees the format
+// in use instead of a sentence to paste. Passage 1 is a distractor, so the
+// example also shows picking the passage that holds the answer.
+const EXAMPLE_QUESTION = "When was the village of Quillby founded?";
+
+const EXAMPLE_PASSAGES: Passage[] = [
+  {
+    title: "Brindle Creek",
+    url: "",
+    content:
+      "Brindle Creek\n\nBrindle Creek is a small river in Ontario, Canada. It is 14 km long.",
+  },
+  {
+    title: "Quillby",
+    url: "",
+    content:
+      "Quillby\n\nQuillby is a fishing village in Denmark. It was founded in 1732.",
+  },
+];
+
+const EXAMPLE_ANSWER = "Quillby was founded in 1732 [2].";
+
+// Passages first, question last: the question is the last thing the model
+// reads before answering. Drops the "Title\n\n" prefix of each chunk: the
+// title is already on the [n] line.
+function userMessage(question: string, passages: Passage[]): Message {
   const context = passages
     .map(
       (passage, i) =>
@@ -33,14 +57,21 @@ export function buildMessages(
     )
     .join("\n\n");
 
-  // Passages first, question last: the question is the last thing the model
-  // reads before answering.
+  return {
+    role: "user",
+    content: `Passages:\n\n${context}\n\nQuestion: ${question}`,
+  };
+}
+
+export function buildMessages(
+  question: string,
+  passages: Passage[],
+): Message[] {
   return [
     { role: "system", content: SYSTEM_PROMPT },
-    {
-      role: "user",
-      content: `Passages:\n\n${context}\n\nQuestion: ${question}`,
-    },
+    userMessage(EXAMPLE_QUESTION, EXAMPLE_PASSAGES),
+    { role: "assistant", content: EXAMPLE_ANSWER },
+    userMessage(question, passages),
   ];
 }
 

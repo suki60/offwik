@@ -1,6 +1,7 @@
 import { connect } from "../db.ts";
 import { chat, embed } from "../ollama.ts";
-import { buildMessages, citedPassages, type Passage } from "../rag.ts";
+import { buildMessages, citedPassages } from "../rag.ts";
+import { search } from "../search.ts";
 import { questions } from "./questions.ts";
 
 // Stage 7, step 2: the gold questions with retrieval, graded like stage 6's
@@ -18,17 +19,6 @@ import { questions } from "./questions.ts";
 const K = 5;
 
 const db = await connect();
-await db.query("SELECT set_config('hnsw.ef_search', '1000', false)");
-
-// Same query as stage 5's search.ts, with the columns the prompt needs.
-const sql = `
-  SELECT a.title, a.url, c.content
-  FROM chunks c
-  JOIN articles a ON a.id = c.article_id
-  WHERE c.embedding IS NOT NULL
-  ORDER BY c.embedding <=> $1::vector
-  LIMIT $2
-`;
 
 // Correct if the reply contains one of the expected answers as a whole word,
 // case-insensitive. The lookarounds use Unicode letters/digits, so "Dan"
@@ -54,15 +44,11 @@ let correct = 0;
 let cited = 0;
 
 for (const [i, { question, title, answers }] of questions.entries()) {
-  const { rows } = await db.query<Passage>(sql, [
-    JSON.stringify(vectors[i]),
-    K,
-  ]);
-
-  const reply = await chat(buildMessages(question, rows));
-  const isRetrieved = rows.some((passage) => passage.title === title);
+  const passages = await search(db, vectors[i] ?? [], K);
+  const reply = await chat(buildMessages(question, passages));
+  const isRetrieved = passages.some((passage) => passage.title === title);
   const isRight = isCorrect(reply, answers);
-  const citedTitles = citedPassages(reply, rows).map(({ title }) => title);
+  const citedTitles = citedPassages(reply, passages).map(({ title }) => title);
   const isCited = citedTitles.includes(title);
   if (isRetrieved) retrieved++;
   if (isRight) correct++;

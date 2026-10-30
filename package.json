@@ -10,7 +10,8 @@
     "load": "tsx src/setup/load.ts",
     "embed": "tsx src/setup/embed.ts",
     "index": "tsx src/setup/index.ts",
-    "rag-eval": "tsx src/eval/rag-eval.ts"
+    "rag-eval": "tsx src/eval/rag-eval.ts",
+    "server": "tsx src/server.ts"
   },
   "type": "module",
   "private": true,
