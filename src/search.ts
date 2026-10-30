@@ -3,11 +3,15 @@ import { embed } from "./ollama.ts";
 
 // Stage 5: run the same query twice, through the HNSW index (approximate) and
 // as an exact brute-force scan, and compare plans, latency and results.
-// Usage: npm run search -- "<question>" [k] [ef_search]   (default k 5)
+// Usage: npm run search -- "<question>" [k] [ef_search]   (default k 5, ef_search 1000)
 
 const query = process.argv[2];
 const k = Number(process.argv[3] ?? 5);
-const efSearch = process.argv[4];
+
+// Stage 6: default 1000 (pgvector's maximum) instead of pgvector's 40. On the
+// eval set, HNSW found 68% of the articles exact search finds at 40, and 95%
+// at 1000, for ~18 ms instead of ~2 ms (exact: ~400 ms).
+const efSearch = process.argv[4] ?? "1000";
 
 if (!query) {
   console.error('Usage: npm run search -- "<question>" [k] [ef_search]');
@@ -29,9 +33,7 @@ const db = await connect();
 // ef_search: how many candidates HNSW keeps while walking the graph (pgvector
 // default 40). Higher = closer to exact, slower. It also caps the number of
 // rows one index scan returns, so keep it >= k.
-if (efSearch) {
-  await db.query("SELECT set_config('hnsw.ef_search', $1, false)", [efSearch]);
-}
+await db.query("SELECT set_config('hnsw.ef_search', $1, false)", [efSearch]);
 
 // <=> is cosine distance (1 - cosine similarity): smaller is closer.
 // ORDER BY distance ASC + LIMIT is the shape the HNSW index can serve.
