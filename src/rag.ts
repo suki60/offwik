@@ -13,10 +13,12 @@ export type Passage = { title: string; url: string; content: string };
 // "https://simple.wikipedia.org/wiki/Loachapoka%2C%20Alabama" letter by letter
 // can garble it, while "[2]" is hard to get wrong. Code turns the number back
 // into a title + URL (citedPassages below).
+// The rule shows a full example reply: with only "like [2]", qwen3.5:0.8b
+// replied with just "[1]" in 23 of 48 questions (rag-eval, stage 7).
 const SYSTEM_PROMPT = `You answer questions using only the numbered passages the user gives you.
 Rules:
 - Answer in one short sentence.
-- After the answer, write the number of the passage you used in square brackets, like [2].
+- End your answer with the number of the passage you used, for example: "The town was founded in 1850 [2]."
 - If the passages do not contain the answer, reply exactly: I don't know.`;
 
 export function buildMessages(
