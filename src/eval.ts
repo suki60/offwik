@@ -1,11 +1,15 @@
+import { existsSync } from "node:fs";
+import { readFile } from "node:fs/promises";
+import { z } from "zod";
 import { connect } from "./db.ts";
 import { embed } from "./ollama.ts";
-import { questions } from "./questions.ts";
+import { questions as goldQuestions } from "./questions.ts";
 
 // Stage 6, step 2: measure retrieval on the eval questions instead of judging
-// answers by eye.
+// answers by eye. Runs once per question set: the hand-written "gold" set
+// (questions.ts) and the synthetic one (npm run generate-questions).
 // 1. Exact search: article-level recall@k (did any of the top k chunks come
-//    from the expected article?).
+//    from the expected article?), with a 95% range.
 // 2. ef_search sweep: how close HNSW gets to exact search (share of the exact
 //    top 10 chunks it also returns), article recall@10 and latency.
 // 3. The questions exact search misses: what came back instead.
@@ -19,12 +23,32 @@ const MAX_K = 20;
 const SWEEP_K = 10;
 const EF_SEARCH_VALUES = [10, 20, 40, 80, 200, 400];
 
-// One request embeds all questions, with the same prefix as search.ts.
-const embeddings = await embed(
-  questions.map((question) => `search_query: ${question.question}`),
-);
+// Same batch size as embed.ts: one request per 64 questions.
+const EMBED_BATCH_SIZE = 64;
 
-const vectors = embeddings.map((embedding) => JSON.stringify(embedding));
+// The synthetic set can have many misses: print only the first ones.
+const MAX_MISSES_SHOWN = 15;
+
+const SYNTHETIC_FILE = "src/synthetic-questions.json";
+
+// Only the fields eval needs; the JSON file has more (answers, chunkId).
+const EvalQuestion = z.object({ question: z.string(), title: z.string() });
+type EvalQuestion = z.infer<typeof EvalQuestion>;
+
+const sets: { name: string; questions: EvalQuestion[] }[] = [
+  { name: "gold (hand-written)", questions: goldQuestions },
+];
+
+if (existsSync(SYNTHETIC_FILE)) {
+  const synthetic = z
+    .array(EvalQuestion)
+    .parse(JSON.parse(await readFile(SYNTHETIC_FILE, "utf8")));
+
+  sets.push({ name: "synthetic (qwen3.5:9b)", questions: synthetic });
+} else {
+  console.log(`${SYNTHETIC_FILE} not found: gold set only\n`);
+}
+
 const db = await connect();
 
 // Same query as search.ts, only the columns the metrics need.
@@ -39,8 +63,25 @@ const sql = `
 
 type Hit = { id: number; title: string };
 
+// Embeds the questions with the same prefix as search.ts.
+async function embedQuestions(questions: EvalQuestion[]) {
+  const vectors: string[] = [];
+
+  for (let i = 0; i < questions.length; i += EMBED_BATCH_SIZE) {
+    const batch = questions.slice(i, i + EMBED_BATCH_SIZE);
+
+    const embeddings = await embed(
+      batch.map((question) => `search_query: ${question.question}`),
+    );
+
+    vectors.push(...embeddings.map((embedding) => JSON.stringify(embedding)));
+  }
+
+  return vectors;
+}
+
 // Runs every question once: the hits and the latency of each query.
-async function runAll(k: number) {
+async function runAll(vectors: string[], k: number) {
   const hits: Hit[][] = [];
   const timings: number[] = [];
 
@@ -66,7 +107,11 @@ function articleRank(hits: Hit[], title: string) {
 }
 
 // Share of questions whose expected article is in the top k.
-function recallAt(hitsPerQuestion: Hit[][], k: number) {
+function recallAt(
+  questions: EvalQuestion[],
+  hitsPerQuestion: Hit[][],
+  k: number,
+) {
   let found = 0;
 
   for (const [i, { title }] of questions.entries()) {
@@ -77,80 +122,103 @@ function recallAt(hitsPerQuestion: Hit[][], k: number) {
   return found / questions.length;
 }
 
-// Exact search first: no index scans in this session, so Postgres computes
-// the distance to every chunk (the stage 4 plan). It is the ground truth HNSW
-// is compared with.
-await db.query("SET enable_indexscan = off");
-const exact = await runAll(MAX_K);
-await db.query("RESET enable_indexscan");
-
-const { rows } = await db.query(
-  "SELECT count(*) AS chunks FROM chunks WHERE embedding IS NOT NULL",
-);
-
-console.log(`${questions.length} questions, ${rows[0].chunks} chunks\n`);
-console.log("Exact search, article-level recall@k:");
-
-for (const k of K_VALUES) {
-  console.log(
-    `  recall@${String(k).padEnd(2)}  ${recallAt(exact.hits, k).toFixed(2)}`,
-  );
+// 95% range of a share measured on n questions (normal approximation):
+// with 48 questions, 0.94 means "somewhere around 0.87-1.00".
+function margin(share: number, n: number) {
+  return 1.96 * Math.sqrt((share * (1 - share)) / n);
 }
 
-console.log(`  median latency ${median(exact.timings).toFixed(1)} ms\n`);
+async function evaluate(name: string, questions: EvalQuestion[]) {
+  const vectors = await embedQuestions(questions);
+  console.log(`=== ${name}: ${questions.length} questions\n`);
 
-// Warm-up: the first HNSW queries read the index from disk. One untimed pass
-// keeps that cost out of the first row of the sweep.
-await runAll(SWEEP_K);
+  // Exact search first: no index scans in this session, so Postgres computes
+  // the distance to every chunk (the stage 4 plan). It is the ground truth
+  // HNSW is compared with.
+  await db.query("SET enable_indexscan = off");
+  const exact = await runAll(vectors, MAX_K);
+  await db.query("RESET enable_indexscan");
+  console.log("Exact search, article-level recall@k:");
 
-console.log(`HNSW vs exact, top ${SWEEP_K}:`);
-console.log("  ef_search  chunks found  recall@10  median latency");
+  for (const k of K_VALUES) {
+    const recall = recallAt(questions, exact.hits, k);
 
-for (const efSearch of EF_SEARCH_VALUES) {
-  await db.query("SELECT set_config('hnsw.ef_search', $1, false)", [
-    String(efSearch),
-  ]);
-
-  const { hits, timings } = await runAll(SWEEP_K);
-
-  // Per question: how many of the exact top 10 chunks HNSW also returned.
-  // Averaged, this is what "HNSW recall" usually means (chunk level).
-  let overlap = 0;
-
-  for (const [i, questionHits] of hits.entries()) {
-    const exactIds = new Set(
-      (exact.hits[i] ?? []).slice(0, SWEEP_K).map((hit) => hit.id),
+    console.log(
+      `  recall@${String(k).padEnd(2)}  ${recall.toFixed(2)} ± ${margin(recall, questions.length).toFixed(2)}`,
     );
-
-    overlap += questionHits.filter((hit) => exactIds.has(hit.id)).length;
   }
 
-  const chunkRecall = overlap / (SWEEP_K * questions.length);
+  console.log(`  median latency ${median(exact.timings).toFixed(1)} ms\n`);
+
+  // Warm-up: the first HNSW queries read the index from disk. One untimed
+  // pass at the default ef_search keeps that cost out of the sweep.
+  await db.query("RESET hnsw.ef_search");
+  await runAll(vectors, SWEEP_K);
+  console.log(`HNSW vs exact, top ${SWEEP_K}:`);
+  console.log("  ef_search  chunks found  recall@10  median latency");
+
+  for (const efSearch of EF_SEARCH_VALUES) {
+    await db.query("SELECT set_config('hnsw.ef_search', $1, false)", [
+      String(efSearch),
+    ]);
+
+    const { hits, timings } = await runAll(vectors, SWEEP_K);
+
+    // Per question: how many of the exact top 10 chunks HNSW also returned.
+    // Averaged, this is what "HNSW recall" usually means (chunk level).
+    let overlap = 0;
+
+    for (const [i, questionHits] of hits.entries()) {
+      const exactIds = new Set(
+        (exact.hits[i] ?? []).slice(0, SWEEP_K).map((hit) => hit.id),
+      );
+
+      overlap += questionHits.filter((hit) => exactIds.has(hit.id)).length;
+    }
+
+    const chunkRecall = overlap / (SWEEP_K * questions.length);
+
+    console.log(
+      `  ${String(efSearch).padStart(9)}  ${chunkRecall.toFixed(3).padStart(12)}  ${recallAt(questions, hits, SWEEP_K).toFixed(2).padStart(9)}  ${median(timings).toFixed(1).padStart(11)} ms`,
+    );
+  }
 
   console.log(
-    `  ${String(efSearch).padStart(9)}  ${chunkRecall.toFixed(3).padStart(12)}  ${recallAt(hits, SWEEP_K).toFixed(2).padStart(9)}  ${median(timings).toFixed(1).padStart(11)} ms`,
+    `  ${"exact".padStart(9)}  ${"1.000".padStart(12)}  ${recallAt(questions, exact.hits, SWEEP_K).toFixed(2).padStart(9)}  ${median(exact.timings).toFixed(1).padStart(11)} ms\n`,
   );
+
+  // Misses: where the expected article ranks in the exact top 20 (or "-" if
+  // it isn't there), and the top 3 articles that came back instead.
+  const misses = questions.flatMap((question, i) => {
+    const hits = exact.hits[i] ?? [];
+    const rank = articleRank(hits, question.title);
+    return rank === null || rank > SWEEP_K ? [{ ...question, rank, hits }] : [];
+  });
+
+  console.log(
+    `Exact search misses (expected article not in the top ${SWEEP_K}): ${misses.length}`,
+  );
+
+  for (const { question, title, rank, hits } of misses.slice(
+    0,
+    MAX_MISSES_SHOWN,
+  )) {
+    const top = hits.slice(0, 3).map((hit) => hit.title);
+
+    console.log(
+      `  [rank ${rank ?? "-"}] ${question}\n    expected: ${title}\n    got:      ${top.join(" | ")}`,
+    );
+  }
+
+  if (misses.length > MAX_MISSES_SHOWN) {
+    console.log(`  … and ${misses.length - MAX_MISSES_SHOWN} more`);
+  }
+
+  console.log();
 }
 
-console.log(
-  `  ${"exact".padStart(9)}  ${"1.000".padStart(12)}  ${recallAt(exact.hits, SWEEP_K).toFixed(2).padStart(9)}  ${median(exact.timings).toFixed(1).padStart(11)} ms\n`,
-);
+for (const { name, questions } of sets) {
+  await evaluate(name, questions);
+}
 
 await db.end();
-
-// Misses: where the expected article ranks in the exact top 20 (or "-" if it
-// isn't there), and the top 3 articles that came back instead.
-console.log(
-  `Exact search misses (expected article not in the top ${SWEEP_K}):`,
-);
-
-for (const [i, { question, title }] of questions.entries()) {
-  const hits = exact.hits[i] ?? [];
-  const rank = articleRank(hits, title);
-  if (rank !== null && rank <= SWEEP_K) continue;
-  const top = hits.slice(0, 3).map((hit) => hit.title);
-
-  console.log(
-    `  [rank ${rank ?? "-"}] ${question}\n    expected: ${title}\n    got:      ${top.join(" | ")}`,
-  );
-}
