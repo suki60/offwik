@@ -1,0 +1,13 @@
+{
+  // The web app (src/web, bundled by Vite): DOM types and JSX, no Node types,
+  // so browser code can't accidentally use process.env or node:fs.
+  // rag.ts is shared with the Node scripts and checked by both configs.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "lib": ["esnext", "dom", "dom.iterable"],
+    "types": [],
+    "jsx": "react-jsx"
+  },
+  "include": ["src/web", "src/rag.ts"],
+  "exclude": []
+}

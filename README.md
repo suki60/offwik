@@ -38,6 +38,7 @@ To start over from scratch: `docker compose down -v` (deletes the database volum
 npm run rag-eval                          # 48 gold questions with retrieval
 CHAT_MODEL=qwen3.5:9b npm run rag-eval    # same, bigger model
 npm run server                            # search API on :3000
+npm run dev                               # web app on :5173 (needs server)
 ```
 
 ## Layout
@@ -48,6 +49,7 @@ src/
   rag.ts             RAG prompt + citations (shared with the web app)
   search.ts          top-k query (HNSW)
   server.ts          POST /api/search for the web app
+  web/               React app: pipeline.ts (embed │ search │ answer), App.tsx
   setup/             download → load (chunker) → embed → index
   eval/              gold questions + rag-eval
 ```

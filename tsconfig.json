@@ -14,5 +14,7 @@
     "moduleDetection": "force",
     "skipLibCheck": true
   },
-  "include": ["src"]
+  "include": ["src", "vite.config.ts"],
+  // Browser code is checked by tsconfig.web.json (DOM types, no Node types).
+  "exclude": ["src/web"]
 }
