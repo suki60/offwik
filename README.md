@@ -8,7 +8,8 @@ RAG over an offline copy of Simple English Wikipedia, with local models (Ollama)
 - Models:
   ```
   ollama pull nomic-embed-text
-  ollama pull qwen3.5:0.8b
+  ollama pull llama3.2:1b
+  ollama pull qwen3.5:0.8b  # optional, for comparisons
   ollama pull qwen3.5:9b    # optional, for comparisons
   ```
 - Port 5432 free (Postgres runs there).
@@ -36,7 +37,7 @@ To start over from scratch: `docker compose down -v` (deletes the database volum
 
 ```
 npm run rag-eval                          # 48 gold questions with retrieval
-CHAT_MODEL=qwen3.5:9b npm run rag-eval    # same, bigger model
+CHAT_MODEL=qwen3.5:9b npm run rag-eval    # same, another model
 npm run server                            # search API on :3000
 npm run dev                               # web app on :5173 (needs server)
 ```

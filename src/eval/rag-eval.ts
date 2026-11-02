@@ -11,8 +11,8 @@ import { questions } from "./questions.ts";
 // - retrieved: is the expected article among the K passages? (search)
 // - correct:   does the reply contain an expected answer? (search + model)
 // - cited:     does the reply cite the expected article? (model)
-// Usage: npm run rag-eval
-//        CHAT_MODEL=qwen3.5:9b npm run rag-eval   (comparison)
+// Usage: npm run rag-eval                          (llama3.2:1b)
+//        CHAT_MODEL=qwen3.5:0.8b npm run rag-eval (comparison)
 
 // Exact recall@5 on the gold set was 1.00 (stage 6). 5 chunks of up to 1,200
 // chars are ~1.5k tokens of context (estimate at 4 chars/token).
@@ -62,7 +62,7 @@ for (const [i, { question, title, answers }] of questions.entries()) {
 await db.end();
 
 const n = questions.length;
-const model = process.env.CHAT_MODEL ?? "qwen3.5:0.8b";
+const model = process.env.CHAT_MODEL ?? "llama3.2:1b";
 console.log(`RAG with ${model}, top ${K}, ${n} questions:`);
 console.log(`  retrieved expected article: ${retrieved}/${n}`);
 console.log(`  answer correct:             ${correct}/${n}`);

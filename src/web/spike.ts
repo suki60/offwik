@@ -4,9 +4,12 @@ import { CreateMLCEngine, type MLCEngine } from "@mlc-ai/web-llm";
 // no retrieval: load the model with WebLLM (WebGPU), chat, show the numbers.
 // Open /spike.html on the dev server (npm run dev).
 
-// WebLLM's prebuilt build of qwen3.5:0.8b (4-bit weights, fp16 activations).
-// Its config says ~1,629 MB of GPU memory and a 4,096-token context.
-const MODEL_ID = "Qwen3.5-0.8B-q4f16_1-MLC";
+// WebLLM's prebuilt build of Llama 3.2 1B (4-bit weights, fp16 activations).
+// Its config says ~879 MB of GPU memory and a 4,096-token context.
+// Qwen3.5-0.8B-q4f16_1-MLC (~1,629 MB) crashed the iPhone tab when memory was
+// tight; Qwen2.5-0.5B and Llama 3.2 1B ran without crashes, Llama answered
+// better.
+const MODEL_ID = "Llama-3.2-1B-Instruct-q4f16_1-MLC";
 
 function element<T extends HTMLElement>(id: string) {
   const found = document.getElementById(id);
@@ -43,7 +46,7 @@ async function checkGpu() {
 }
 
 // Question 2: does the model download, compile and fit in memory? The first
-// load downloads ~884 MB from Hugging Face; WebLLM caches the files in the
+// load downloads ~695 MB from Hugging Face; WebLLM caches the files in the
 // browser (Cache API), so a reload only reads them back.
 async function load() {
   loadButton.disabled = true;
@@ -77,13 +80,13 @@ async function ask(event: SubmitEvent) {
   stats.textContent = "";
 
   try {
-    // Thinking off, as with Ollama since stage 6 (reasoning_effort "none").
+    // No enable_thinking: Llama 3.2 doesn't think, and WebLLM would put an
+    // empty <think></think> in front of the reply that only Qwen3 understands.
     const chunks = await engine.chat.completions.create({
       messages: [{ role: "user", content: text }],
       temperature: 0,
       stream: true,
       stream_options: { include_usage: true },
-      extra_body: { enable_thinking: false },
     });
 
     for await (const chunk of chunks) {

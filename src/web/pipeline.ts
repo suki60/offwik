@@ -8,7 +8,7 @@ import { buildMessages, citedPassages, type Passage } from "../rag.ts";
 // - answer:     Ollama now, WebLLM / transformers.js in stage 8
 // Relative URLs: vite.config.ts proxies /ollama to Ollama and /api to server.ts.
 
-export const MODELS = ["qwen3.5:0.8b", "qwen3.5:9b"];
+export const MODELS = ["llama3.2:1b", "qwen3.5:0.8b", "qwen3.5:9b"];
 
 // Same k as rag-eval.ts, where this prompt scored 37/48 (0.8b) and 46/48 (9b).
 const K = 5;

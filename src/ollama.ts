@@ -38,18 +38,19 @@ const ChatResponse = z.object({
   choices: z.array(z.object({ message: z.object({ content: z.string() }) })),
 });
 
-// The model defaults to the phone model. CHAT_MODEL picks another one to
-// compare, e.g. CHAT_MODEL=qwen3.5:9b npm run rag-eval
+// The model defaults to the phone model (llama3.2:1b since stage 8, before:
+// qwen3.5:0.8b). CHAT_MODEL picks another one to compare, e.g.
+// CHAT_MODEL=qwen3.5:0.8b npm run rag-eval
 export async function chat(messages: Message[]): Promise<string> {
   const response = await fetch(`${ollamaUrl}/chat/completions`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: process.env.CHAT_MODEL ?? "qwen3.5:0.8b",
+      model: process.env.CHAT_MODEL ?? "llama3.2:1b",
       messages,
       // qwen3.5 thinks before answering by default (a long `reasoning` field).
       // "none" turns that off: checked against Ollama, the reply comes back
-      // without `reasoning`.
+      // without `reasoning`. llama3.2 doesn't think at all.
       reasoning_effort: "none",
       // Same question, same answer: makes reruns comparable.
       temperature: 0,
