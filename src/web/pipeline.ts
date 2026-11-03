@@ -38,7 +38,7 @@ async function postJson(url: string, body: unknown) {
 // Stage 9, step 4b: the query is embedded in the browser by transformers.js
 // (was Ollama's /v1/embeddings). Same model as the stored vectors, ONNX export.
 // dtype must be set: without it transformers.js picks q8 on wasm and fp32 on
-// WebGPU. fp16 gave Ollama's vectors exactly (cosine 1.0000, embed-parity.ts)
+// WebGPU. fp16 gave Ollama's vectors exactly (cosine 1.0000, PLAN.md stage 9)
 // and 48/48 in search-eval.ts; q8 drifted (0.97) and lost one question.
 // The weights (~275 MB) are downloaded once and cached by the browser.
 const EMBED_MODEL = "nomic-ai/nomic-embed-text-v1.5";
@@ -56,7 +56,7 @@ export function loadEmbedder(onProgress?: (info: ProgressInfo) => void) {
   return embedder;
 }
 
-// Same prefix and pooling as embed-parity.ts: "search_query: " for queries,
+// Same prefix and pooling as eval/search-eval.ts: "search_query: " for queries,
 // mean over the tokens, then length 1.
 export async function embedQuery(question: string): Promise<number[]> {
   const extractor = await loadEmbedder();

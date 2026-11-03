@@ -12,7 +12,6 @@
     "index": "tsx src/setup/index.ts",
     "export": "tsx src/setup/export.ts",
     "rag-eval": "tsx src/eval/rag-eval.ts",
-    "embed-parity": "tsx src/eval/embed-parity.ts",
     "search-eval": "tsx src/eval/search-eval.ts",
     "dev": "vite"
   },

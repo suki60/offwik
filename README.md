@@ -39,7 +39,6 @@ To start over from scratch: `docker compose down -v` (deletes the database volum
 ```
 npm run rag-eval                          # 48 gold questions with retrieval
 CHAT_MODEL=qwen3.5:9b npm run rag-eval    # same, another model
-npm run embed-parity                      # transformers.js vs Ollama vectors
 npm run search-eval [-- <candidates>]     # file search vs pgvector, recall@5
 npm run dev                               # web app on :5173 (needs Ollama)
 ```
@@ -57,5 +56,5 @@ src/
   web/               React app: pipeline.ts (embed │ search │ answer), App.tsx,
                      store.ts (OPFS), search-eval.ts (in-browser eval)
   setup/             download → load (chunker) → embed → index → export
-  eval/              gold questions, rag-eval, embed-parity, search-eval
+  eval/              gold questions, rag-eval, search-eval
 ```
