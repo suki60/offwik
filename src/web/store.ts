@@ -116,8 +116,8 @@ async function open(onProgress?: Progress): Promise<Store> {
   };
 }
 
-// One copy at a time: React's StrictMode runs effects twice in development,
-// and the second call must reuse the first instead of copying again.
+// One copy at a time: the app's load and the search eval both call this, and
+// a second call must reuse the first instead of copying again.
 let opening: Promise<Store> | undefined;
 
 export function openStore(onProgress?: Progress) {
