@@ -1,6 +1,13 @@
 import { type FormEvent, useEffect, useState } from "react";
 import type { Passage } from "../rag.ts";
-import { answer, embedQuery, MODELS, search } from "./pipeline.ts";
+import {
+  answer,
+  embedQuery,
+  loadEmbedder,
+  MODELS,
+  search,
+} from "./pipeline.ts";
+import { runSearchEval } from "./search-eval.ts";
 import { openStore } from "./store.ts";
 
 // Stage 7, step 4: ask a question, see the answer with its citations and the
@@ -38,20 +45,60 @@ export function App() {
     (turn) => turn.status === "searching" || turn.status === "answering",
   );
 
+  const [evalStatus, setEvalStatus] = useState("");
+
   // Stage 9: the search data lives in OPFS. The first visit copies it there
-  // (~610 MB, with progress); later visits only open it.
+  // (~610 MB, with progress); later visits only open it. Then the embedding
+  // model: downloaded on the first visit (~275 MB), from the browser cache
+  // after that. Its load time shows how long a cold start takes.
   useEffect(() => {
-    openStore((copied, total) =>
-      setDataStatus(
-        `Copying the search data… ${(copied / 1e6).toFixed(0)} / ${(total / 1e6).toFixed(0)} MB`,
-      ),
-    )
-      .then(() => {
-        setIsReady(true);
-        setDataStatus("");
-      })
-      .catch((error) => setDataStatus(`Search data error: ${error}`));
+    async function load() {
+      await openStore((copied, total) =>
+        setDataStatus(
+          `Copying the search data… ${(copied / 1e6).toFixed(0)} / ${(total / 1e6).toFixed(0)} MB`,
+        ),
+      );
+
+      setDataStatus("Loading the embedding model…");
+      const start = performance.now();
+
+      await loadEmbedder((info) => {
+        if (info.status === "progress") {
+          setDataStatus(
+            `Loading the embedding model… ${info.file} ${info.progress.toFixed(0)}%`,
+          );
+        }
+      });
+
+      console.log(
+        `Embedding model loaded in ${(performance.now() - start).toFixed(0)} ms`,
+      );
+
+      setIsReady(true);
+      setDataStatus("");
+    }
+
+    load().catch((error) => setDataStatus(`Loading error: ${error}`));
   }, []);
+
+  // The 48 gold questions through embedQuery + search only (search-eval.ts).
+  async function evaluate() {
+    setEvalStatus("Search eval: 0/48…");
+
+    try {
+      const result = await runSearchEval((done) =>
+        setEvalStatus(`Search eval: ${done}/48…`),
+      );
+
+      setEvalStatus(
+        `Search eval: ${result.hits}/${result.total} retrieved · per question: embed ${result.embedMs.toFixed(0)} ms · search ${result.searchMs.toFixed(0)} ms (hamming ${result.hammingMs.toFixed(0)} ms)${result.misses.map((miss) => `\n✗ ${miss}`).join("")}`,
+      );
+    } catch (error) {
+      setEvalStatus(`Search eval error: ${error}`);
+    }
+  }
+
+  const isEvaluating = evalStatus.endsWith("…");
 
   // Merges changes into one turn. Functional update: always applies to the
   // latest state, even after other updates happened in between.
@@ -139,11 +186,13 @@ export function App() {
       <form onSubmit={ask}>
         <input
           type="text"
+          name="question"
           value={question}
           onChange={(event) => setQuestion(event.target.value)}
           placeholder="Ask about Simple English Wikipedia…"
         />
         <select
+          name="model"
           value={model}
           onChange={(event) => setModel(event.target.value)}
         >
@@ -156,6 +205,20 @@ export function App() {
         </button>
       </form>
       {dataStatus && <p className="meta">{dataStatus}</p>}
+      <p className="meta">
+        <button
+          type="button"
+          onClick={evaluate}
+          disabled={!isReady || isBusy || isEvaluating}
+        >
+          Run search eval
+        </button>
+      </p>
+      {evalStatus && (
+        <p className="meta" style={{ whiteSpace: "pre-line" }}>
+          {evalStatus}
+        </p>
+      )}
       {turns.map((turn) => (
         <TurnView key={turn.id} turn={turn} />
       ))}

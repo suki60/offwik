@@ -1,3 +1,8 @@
+import {
+  type FeatureExtractionPipeline,
+  type ProgressInfo,
+  pipeline,
+} from "@huggingface/transformers";
 import { z } from "zod";
 import { buildMessages, citedPassages, type Passage } from "../rag.ts";
 import { hammingTopN, rescore, toBits } from "../vector-search.ts";
@@ -5,10 +10,10 @@ import { openStore } from "./store.ts";
 
 // Stage 7, step 4: the three steps of a RAG answer in the browser, each behind
 // its own function so later stages can swap one without touching the UI:
-// - embedQuery: Ollama now, transformers.js in stage 9
+// - embedQuery: transformers.js in the browser since stage 9 (was Ollama)
 // - search:     inside the browser since stage 9 (was server.ts + pgvector)
-// - answer:     Ollama now, WebLLM / transformers.js in stage 8
-// Relative URLs: vite.config.ts proxies /ollama to Ollama.
+// - answer:     Ollama now, WebLLM in stage 10
+// Relative URL: vite.config.ts proxies /ollama to Ollama.
 
 export const MODELS = ["llama3.2:1b", "qwen3.5:0.8b", "qwen3.5:9b"];
 
@@ -30,23 +35,38 @@ async function postJson(url: string, body: unknown) {
   return response.json();
 }
 
-const EmbeddingsResponse = z.object({
-  data: z.array(z.object({ embedding: z.array(z.number()) })),
-});
+// Stage 9, step 4b: the query is embedded in the browser by transformers.js
+// (was Ollama's /v1/embeddings). Same model as the stored vectors, ONNX export.
+// dtype must be set: without it transformers.js picks q8 on wasm and fp32 on
+// WebGPU. fp16 gave Ollama's vectors exactly (cosine 1.0000, embed-parity.ts)
+// and 48/48 in search-eval.ts; q8 drifted (0.97) and lost one question.
+// The weights (~275 MB) are downloaded once and cached by the browser.
+const EMBED_MODEL = "nomic-ai/nomic-embed-text-v1.5";
 
-// Same model and prefix as the stored vectors were compared with in
-// rag-eval.ts: queries get "search_query: ".
-export async function embedQuery(question: string) {
-  const { data } = EmbeddingsResponse.parse(
-    await postJson("/ollama/v1/embeddings", {
-      model: "nomic-embed-text",
-      input: `search_query: ${question}`,
-    }),
-  );
+let embedder: Promise<FeatureExtractionPipeline> | undefined;
 
-  const embedding = data[0]?.embedding;
-  if (!embedding) throw new Error("Ollama returned no embedding");
-  return embedding;
+// Loads the model once; later calls reuse it (same reason as openStore).
+export function loadEmbedder(onProgress?: (info: ProgressInfo) => void) {
+  embedder ??= pipeline("feature-extraction", EMBED_MODEL, {
+    dtype: "fp16",
+    device: "webgpu",
+    progress_callback: onProgress,
+  });
+
+  return embedder;
+}
+
+// Same prefix and pooling as embed-parity.ts: "search_query: " for queries,
+// mean over the tokens, then length 1.
+export async function embedQuery(question: string): Promise<number[]> {
+  const extractor = await loadEmbedder();
+
+  const output = await extractor(`search_query: ${question}`, {
+    pooling: "mean",
+    normalize: true,
+  });
+
+  return output.tolist()[0];
 }
 
 // Stage 9, step 4a: search the exported files in OPFS (store.ts) instead of

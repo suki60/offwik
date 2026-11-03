@@ -1,8 +1,8 @@
 {
   // The web app (src/web, bundled by Vite): DOM types and JSX, no Node types,
   // so browser code can't accidentally use process.env or node:fs.
-  // rag.ts and vector-search.ts are shared with the Node scripts and checked
-  // by both configs.
+  // rag.ts, vector-search.ts and eval/questions.ts are shared with the Node
+  // scripts and checked by both configs.
   // Module resolution like Vite's ("bundler"), not Node's: @mlc-ai/web-llm's
   // .d.ts files import "./config" without an extension, which "nodenext"
   // rejects, and skipLibCheck hid that by turning all its types into any.
@@ -14,6 +14,11 @@
     "types": [],
     "jsx": "react-jsx"
   },
-  "include": ["src/web", "src/rag.ts", "src/vector-search.ts"],
+  "include": [
+    "src/web",
+    "src/rag.ts",
+    "src/vector-search.ts",
+    "src/eval/questions.ts"
+  ],
   "exclude": []
 }
