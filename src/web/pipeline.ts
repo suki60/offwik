@@ -1,12 +1,14 @@
 import { z } from "zod";
 import { buildMessages, citedPassages, type Passage } from "../rag.ts";
+import { hammingTopN, rescore, toBits } from "../vector-search.ts";
+import { openStore } from "./store.ts";
 
 // Stage 7, step 4: the three steps of a RAG answer in the browser, each behind
 // its own function so later stages can swap one without touching the UI:
 // - embedQuery: Ollama now, transformers.js in stage 9
-// - search:     server.ts + pgvector now, search inside the browser in stage 9
+// - search:     inside the browser since stage 9 (was server.ts + pgvector)
 // - answer:     Ollama now, WebLLM / transformers.js in stage 8
-// Relative URLs: vite.config.ts proxies /ollama to Ollama and /api to server.ts.
+// Relative URLs: vite.config.ts proxies /ollama to Ollama.
 
 export const MODELS = ["llama3.2:1b", "qwen3.5:0.8b", "qwen3.5:9b"];
 
@@ -47,12 +49,19 @@ export async function embedQuery(question: string) {
   return embedding;
 }
 
-const Passages = z.array(
-  z.object({ title: z.string(), url: z.string(), content: z.string() }),
-);
+// Stage 9, step 4a: search the exported files in OPFS (store.ts) instead of
+// server.ts + pgvector. Hamming over all rows, int8 rescore of the best
+// CANDIDATES: 48/48 in search-eval.ts with 200 (pgvector HNSW: 46/48).
+const CANDIDATES = 200;
 
-export async function search(vector: number[]): Promise<Passage[]> {
-  return Passages.parse(await postJson("/api/search", { vector, k: K }));
+export async function search(vector: number[]) {
+  const { bits, readRow, readRecord } = await openStore();
+  const start = performance.now();
+  const candidates = hammingTopN(bits, toBits(vector), CANDIDATES);
+  const hammingMs = performance.now() - start;
+  const top = await rescore(candidates, readRow, vector, K);
+  const passages = await Promise.all(top.map(readRecord));
+  return { passages, hammingMs };
 }
 
 const ChatResponse = z.object({

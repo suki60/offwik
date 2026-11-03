@@ -1,6 +1,7 @@
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useEffect, useState } from "react";
 import type { Passage } from "../rag.ts";
 import { answer, embedQuery, MODELS, search } from "./pipeline.ts";
+import { openStore } from "./store.ts";
 
 // Stage 7, step 4: ask a question, see the answer with its citations and the
 // passages it was given. Each question is one "turn" that moves through
@@ -16,7 +17,13 @@ type Turn = {
   cited: Passage[];
   error: string;
   // Milliseconds per step, to see where the time goes.
-  timings: { embed?: number; search?: number; answer?: number };
+  // hamming is the part of search spent on the Hamming scan (stage 9).
+  timings: {
+    embed?: number;
+    search?: number;
+    hamming?: number;
+    answer?: number;
+  };
 };
 
 export function App() {
@@ -24,9 +31,27 @@ export function App() {
   const [turns, setTurns] = useState<Turn[]>([]);
   const [question, setQuestion] = useState("");
   const [model, setModel] = useState(MODELS[0] ?? "");
+  const [dataStatus, setDataStatus] = useState("Opening the search data…");
+  const [isReady, setIsReady] = useState(false);
+
   const isBusy = turns.some(
     (turn) => turn.status === "searching" || turn.status === "answering",
   );
+
+  // Stage 9: the search data lives in OPFS. The first visit copies it there
+  // (~610 MB, with progress); later visits only open it.
+  useEffect(() => {
+    openStore((copied, total) =>
+      setDataStatus(
+        `Copying the search data… ${(copied / 1e6).toFixed(0)} / ${(total / 1e6).toFixed(0)} MB`,
+      ),
+    )
+      .then(() => {
+        setIsReady(true);
+        setDataStatus("");
+      })
+      .catch((error) => setDataStatus(`Search data error: ${error}`));
+  }, []);
 
   // Merges changes into one turn. Functional update: always applies to the
   // latest state, even after other updates happened in between.
@@ -39,7 +64,7 @@ export function App() {
   async function ask(event: FormEvent) {
     event.preventDefault();
     const text = question.trim();
-    if (!text || isBusy) return;
+    if (!text || isBusy || !isReady) return;
     const id = crypto.randomUUID();
     setQuestion("");
 
@@ -64,13 +89,13 @@ export function App() {
       const vector = await embedQuery(text);
       const embedMs = performance.now() - start;
       start = performance.now();
-      const passages = await search(vector);
+      const { passages, hammingMs } = await search(vector);
       const searchMs = performance.now() - start;
 
       update(id, {
         status: "answering",
         passages,
-        timings: { embed: embedMs, search: searchMs },
+        timings: { embed: embedMs, search: searchMs, hamming: hammingMs },
       });
 
       start = performance.now();
@@ -83,6 +108,7 @@ export function App() {
         timings: {
           embed: embedMs,
           search: searchMs,
+          hamming: hammingMs,
           answer: performance.now() - start,
         },
       });
@@ -107,7 +133,9 @@ export function App() {
           {theme === "light" ? "☾ Dark" : "☀ Light"}
         </button>
       </header>
-      <p className="intro">Ask a question and explore the articles behind the answer.</p>
+      <p className="intro">
+        Ask a question and explore the articles behind the answer.
+      </p>
       <form onSubmit={ask}>
         <input
           type="text"
@@ -123,10 +151,11 @@ export function App() {
             <option key={name}>{name}</option>
           ))}
         </select>
-        <button type="submit" disabled={isBusy}>
+        <button type="submit" disabled={isBusy || !isReady}>
           Ask
         </button>
       </form>
+      {dataStatus && <p className="meta">{dataStatus}</p>}
       {turns.map((turn) => (
         <TurnView key={turn.id} turn={turn} />
       ))}
@@ -135,11 +164,12 @@ export function App() {
 }
 
 function TurnView({ turn }: { turn: Turn }) {
-  const { embed, search, answer } = turn.timings;
+  const { embed, search, hamming, answer } = turn.timings;
 
   const timings = [
     embed && `embed ${embed.toFixed(0)} ms`,
-    search && `search ${search.toFixed(0)} ms`,
+    search &&
+      `search ${search.toFixed(0)} ms (hamming ${hamming?.toFixed(0)} ms)`,
     answer && `answer ${answer.toFixed(0)} ms`,
   ]
     .filter(Boolean)
