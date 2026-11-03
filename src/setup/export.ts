@@ -1,3 +1,4 @@
+import { existsSync, readFileSync } from "node:fs";
 import { mkdir, open, writeFile } from "node:fs/promises";
 import { connect } from "../db.ts";
 
@@ -12,7 +13,8 @@ import { connect } from "../db.ts";
 //                [offsets[i], offsets[i + 1]) of text.bin
 // - meta.json    { count, dims, scale }
 // Vite serves public/ as is, so the page fetches /data/vectors.bin etc.
-// Overwrites the files on every run.
+// Setup step 5: skipped when meta.json already counts every embedded chunk.
+// To export again (e.g. after re-embedding): rm -r public/data
 // Usage: npm run export
 
 const DIR = "public/data";
@@ -22,16 +24,38 @@ const PAGE = 5_000;
 
 const db = await connect();
 
+async function embeddedCount() {
+  const { rows } = await db.query<{ count: number }>(
+    "SELECT count(*) FROM chunks WHERE embedding IS NOT NULL",
+  );
+
+  return rows[0]?.count ?? 0;
+}
+
 // One global scale for int8: the largest absolute value in any vector. With
 // unit vectors the values are around ±0.04, so x * 127 directly would use only
 // a handful of the 255 steps. vector::real[] makes the values unnest-able.
-const { rows: scaleRows } = await db.query<{ scale: number }>(
-  `SELECT max(abs(x)) AS scale
-   FROM chunks, unnest(embedding::real[]) AS x
-   WHERE embedding IS NOT NULL`,
-);
+async function maxAbs() {
+  const { rows } = await db.query<{ scale: number }>(
+    `SELECT max(abs(x)) AS scale
+     FROM chunks, unnest(embedding::real[]) AS x
+     WHERE embedding IS NOT NULL`,
+  );
 
-const scale = scaleRows[0]?.scale ?? 1;
+  return rows[0]?.scale ?? 1;
+}
+
+if (existsSync(`${DIR}/meta.json`)) {
+  const meta = JSON.parse(readFileSync(`${DIR}/meta.json`, "utf8"));
+
+  if (meta.count === (await embeddedCount())) {
+    console.log(`${DIR} already holds all ${meta.count} rows, nothing to do.`);
+    await db.end();
+    process.exit(0);
+  }
+}
+
+const scale = await maxAbs();
 console.log(`int8 scale (max |value|): ${scale}`);
 
 await mkdir(DIR, { recursive: true });

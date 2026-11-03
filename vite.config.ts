@@ -8,10 +8,10 @@ import { defineConfig } from "vite";
 const hasCerts = existsSync("certs/key.pem") && existsSync("certs/cert.pem");
 
 // Stage 7, step 4: the web app's dev server (npm run dev, port 5173).
-// The browser only talks to this server. The proxy forwards:
-// - /ollama/* to Ollama (embeddings + chat), without the /ollama prefix
-// - /api/*    to server.ts (search)
-// Same origin for everything, so no CORS setup in Ollama or server.ts.
+// The browser only talks to this server. The proxy forwards /ollama/* to
+// Ollama (chat), without the /ollama prefix: same origin, so no CORS setup in
+// Ollama. Since stage 9 embedding and search run in the browser, so server.ts
+// and its /api proxy are gone (see commit b0f7fae to restore them).
 export default defineConfig({
   plugins: [react()],
   server: {
@@ -28,7 +28,6 @@ export default defineConfig({
         target: "http://localhost:11434",
         rewrite: (path) => path.replace(/^\/ollama/, ""),
       },
-      "/api": "http://localhost:3000",
     },
   },
 });

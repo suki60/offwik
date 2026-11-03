@@ -238,6 +238,13 @@ function TurnView({ turn }: { turn: Turn }) {
     .filter(Boolean)
     .join(" · ");
 
+  // One link per article: the reply can cite two chunks of the same article
+  // ([1] and [2] both Barcelona), which share a URL and would share a key.
+  const sources = turn.cited.filter(
+    (passage, i) =>
+      turn.cited.findIndex(({ url }) => url === passage.url) === i,
+  );
+
   return (
     <section className="turn">
       <div className="question">{turn.question}</div>
@@ -253,10 +260,10 @@ function TurnView({ turn }: { turn: Turn }) {
           <p>
             <Reply reply={turn.reply} passages={turn.passages} />
           </p>
-          {turn.cited.length > 0 && (
+          {sources.length > 0 && (
             <p className="meta">
               Sources:{" "}
-              {turn.cited.map((passage, i) => (
+              {sources.map((passage, i) => (
                 <span key={passage.url}>
                   {i > 0 && ", "}
                   <a href={passage.url} target="_blank" rel="noreferrer">

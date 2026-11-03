@@ -5,7 +5,7 @@
     "lint": "biome check .",
     "typecheck": "tsc && tsc -p tsconfig.web.json",
     "format": "biome check --write .",
-    "setup": "npm run download && npm run load && npm run embed && npm run index",
+    "setup": "npm run download && npm run load && npm run embed && npm run index && npm run export",
     "download": "tsx src/setup/download.ts",
     "load": "tsx src/setup/load.ts",
     "embed": "tsx src/setup/embed.ts",
@@ -14,7 +14,6 @@
     "rag-eval": "tsx src/eval/rag-eval.ts",
     "embed-parity": "tsx src/eval/embed-parity.ts",
     "search-eval": "tsx src/eval/search-eval.ts",
-    "server": "tsx src/server.ts",
     "dev": "vite"
   },
   "type": "module",

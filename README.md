@@ -22,7 +22,7 @@ docker compose up -d
 npm run setup
 ```
 
-`npm run setup` runs four steps. Each one can be rerun on its own, and rerunning skips work already done, so after a crash just run `npm run setup` again.
+`npm run setup` runs five steps. Each one can be rerun on its own, and rerunning skips work already done, so after a crash just run `npm run setup` again.
 
 | Step | What it does | Expect |
 | --- | --- | --- |
@@ -30,6 +30,7 @@ npm run setup
 | `npm run load` | Chunks every article into the `articles` + `chunks` tables | 238,243 articles, 370,859 chunks |
 | `npm run embed` | Embeds every chunk with `nomic-embed-text` (resumable) | ~50 min at ~125 chunks/s |
 | `npm run index` | Builds the HNSW index (m 16, ef_construction 128) | ~1,448 MB, a few minutes |
+| `npm run export` | Writes chunks + binary/int8 vectors to `public/data/` for the web app | 4 files, 609.5 MB |
 
 To start over from scratch: `docker compose down -v` (deletes the database volume), then `docker compose up -d` and `npm run setup`.
 
@@ -38,9 +39,12 @@ To start over from scratch: `docker compose down -v` (deletes the database volum
 ```
 npm run rag-eval                          # 48 gold questions with retrieval
 CHAT_MODEL=qwen3.5:9b npm run rag-eval    # same, another model
-npm run server                            # search API on :3000
-npm run dev                               # web app on :5173 (needs server)
+npm run embed-parity                      # transformers.js vs Ollama vectors
+npm run search-eval [-- <candidates>]     # file search vs pgvector, recall@5
+npm run dev                               # web app on :5173 (needs Ollama)
 ```
+
+The web app embeds and searches in the browser: on the first visit it copies `public/data/` into the browser's storage (OPFS) and downloads the embedding model (~275 MB). Only the answer still goes to Ollama. With `certs/` present it serves HTTPS, so the browser must trust the CA that signed `certs/cert.pem`.
 
 ## Layout
 
@@ -48,9 +52,10 @@ npm run dev                               # web app on :5173 (needs server)
 src/
   db.ts, ollama.ts   Postgres client, Ollama embed/chat
   rag.ts             RAG prompt + citations (shared with the web app)
-  search.ts          top-k query (HNSW)
-  server.ts          POST /api/search for the web app
-  web/               React app: pipeline.ts (embed │ search │ answer), App.tsx
-  setup/             download → load (chunker) → embed → index
-  eval/              gold questions + rag-eval
+  search.ts          top-k query (pgvector HNSW), the reference
+  vector-search.ts   Hamming + int8 rescore over public/data (Node + browser)
+  web/               React app: pipeline.ts (embed │ search │ answer), App.tsx,
+                     store.ts (OPFS), search-eval.ts (in-browser eval)
+  setup/             download → load (chunker) → embed → index → export
+  eval/              gold questions, rag-eval, embed-parity, search-eval
 ```
