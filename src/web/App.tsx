@@ -20,6 +20,7 @@ type Turn = {
 };
 
 export function App() {
+  const [theme, setTheme] = useState<"light" | "dark">("light");
   const [turns, setTurns] = useState<Turn[]>([]);
   const [question, setQuestion] = useState("");
   const [model, setModel] = useState(MODELS[0] ?? "");
@@ -91,8 +92,22 @@ export function App() {
   }
 
   return (
-    <main>
-      <h1>Wiki RAG</h1>
+    <main data-theme={theme}>
+      <header className="app-header">
+        <div>
+          <p className="eyebrow">SIMPLE ENGLISH WIKIPEDIA</p>
+          <h1>Wiki RAG</h1>
+        </div>
+        <button
+          className="theme-toggle"
+          type="button"
+          onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+          aria-label={`Switch to ${theme === "light" ? "dark" : "light"} theme`}
+        >
+          {theme === "light" ? "☾ Dark" : "☀ Light"}
+        </button>
+      </header>
+      <p className="intro">Ask a question and explore the articles behind the answer.</p>
       <form onSubmit={ask}>
         <input
           type="text"

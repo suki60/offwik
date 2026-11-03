@@ -5,46 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Wiki RAG</title>
     <style>
-      body {
-        font-family: system-ui, sans-serif;
-        max-width: 720px;
-        margin: 0 auto;
-        padding: 16px;
-        line-height: 1.5;
+      :root {
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: #17231f;
+        background: #f4f6f2;
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
       }
-      form {
-        display: flex;
-        gap: 8px;
-      }
-      input[type="text"] {
-        flex: 1;
-        padding: 8px;
-        font-size: 16px;
-      }
-      .turn {
-        border-top: 1px solid #ddd;
-        padding: 12px 0;
-      }
-      .question {
-        font-weight: 600;
-      }
-      .meta {
-        color: #777;
-        font-size: 13px;
-      }
-      .passage {
-        margin: 8px 0;
-        padding: 8px;
-        background: #f6f6f6;
-        font-size: 14px;
-        white-space: pre-wrap;
-      }
-      .passage.cited {
-        background: #e6f2ff;
-      }
-      .error {
-        color: #c00;
-      }
+      * { box-sizing: border-box; }
+      body { margin: 0; min-height: 100vh; padding: 64px 20px; line-height: 1.55; }
+      main { --surface: #fff; --text: #17231f; --muted: #728078; --line: #e3e9e3; --soft: #f4f7f3; --accent: #176b52; --accent-soft: #e7f3ed; max-width: 760px; margin: 0 auto; color: var(--text); }
+      main[data-theme="dark"] { --surface: #1d2925; --text: #edf4ef; --muted: #a4b3aa; --line: #35443d; --soft: #26342e; --accent: #8bd3ac; --accent-soft: #2b4839; }
+      :root:has(main[data-theme="dark"]) { color-scheme: dark; background: #121a16; }
+      .app-header { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+      h1 { margin: 0; font-size: clamp(2rem, 5vw, 2.7rem); letter-spacing: -0.055em; line-height: 1.12; }
+      .eyebrow { margin: 0 0 8px; color: var(--accent); font-size: 11px; font-weight: 750; letter-spacing: .14em; }
+      .intro { margin: 12px 0 26px; color: var(--muted); }
+      form { display: flex; gap: 10px; padding: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 12px 32px #19291d0a; }
+      input[type="text"], select, button { font: inherit; }
+      input[type="text"] { flex: 1; min-width: 0; padding: 10px 12px; color: var(--text); background: transparent; border: 0; outline: none; }
+      input::placeholder { color: var(--muted); }
+      select { max-width: 190px; padding: 0 10px; color: var(--text); background: var(--soft); border: 0; border-radius: 9px; }
+      button { padding: 10px 18px; color: white; background: #176b52; border: 0; border-radius: 10px; font-weight: 650; cursor: pointer; }
+      button:disabled { opacity: .55; cursor: wait; }
+      .theme-toggle { padding: 9px 13px; color: var(--text); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; font-size: 13px; }
+      .turn { margin-top: 24px; padding: 20px 22px; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; }
+      .question { font-weight: 680; }
+      .meta { color: var(--muted); font-size: 13px; }
+      .turn a { color: var(--accent); }
+      .passage { margin: 8px 0; padding: 12px; color: var(--text); background: var(--soft); border-radius: 9px; font-size: 14px; white-space: pre-wrap; }
+      .passage.cited { background: var(--accent-soft); }
+      .error { color: #d44d4d; }
+      @media (max-width: 560px) { body { padding: 32px 16px; } form { flex-wrap: wrap; } input[type="text"] { flex-basis: 100%; } select { flex: 1; max-width: none; min-height: 42px; } }
     </style>
   </head>
   <body>
