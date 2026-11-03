@@ -3,7 +3,12 @@ import {
   type ProgressInfo,
   pipeline,
 } from "@huggingface/transformers";
-import { z } from "zod";
+import {
+  type CompletionUsage,
+  CreateMLCEngine,
+  type InitProgressReport,
+  type MLCEngine,
+} from "@mlc-ai/web-llm";
 import { buildMessages, citedPassages, type Passage } from "../rag.ts";
 import { hammingTopN, rescore, toBits } from "../vector-search.ts";
 import { openStore } from "./store.ts";
@@ -12,28 +17,10 @@ import { openStore } from "./store.ts";
 // its own function so later stages can swap one without touching the UI:
 // - embedQuery: transformers.js in the browser since stage 9 (was Ollama)
 // - search:     inside the browser since stage 9 (was server.ts + pgvector)
-// - answer:     Ollama now, WebLLM in stage 10
-// Relative URL: vite.config.ts proxies /ollama to Ollama.
+// - answer:     WebLLM in the browser since stage 10 (was Ollama)
 
-export const MODELS = ["llama3.2:1b", "qwen3.5:0.8b", "qwen3.5:9b"];
-
-// Same k as rag-eval.ts, where this prompt scored 37/48 (0.8b) and 46/48 (9b).
+// Same k as rag-eval.ts, where this prompt scored 42/48 with llama3.2:1b.
 const K = 5;
-
-async function postJson(url: string, body: unknown) {
-  const response = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-
-  // fetch only rejects on network errors: HTTP errors have to be checked by hand.
-  if (!response.ok) {
-    throw new Error(`${url} ${response.status}: ${await response.text()}`);
-  }
-
-  return response.json();
-}
 
 // Stage 9, step 4b: the query is embedded in the browser by transformers.js
 // (was Ollama's /v1/embeddings). Same model as the stored vectors, ONNX export.
@@ -84,25 +71,46 @@ export async function search(vector: number[]) {
   return { passages, hammingMs };
 }
 
-const ChatResponse = z.object({
-  choices: z.array(z.object({ message: z.object({ content: z.string() }) })),
-});
+// Stage 10, step 1: the answer comes from WebLLM in the browser (was
+// Ollama). Same model as rag-eval.ts in Node (llama3.2:1b), WebLLM's 4-bit
+// build: ~695 MB download, ~879 MB GPU memory (stage 8). The weights are
+// cached by WebLLM (Cache API) after the first download.
+export const CHAT_MODEL = "Llama-3.2-1B-Instruct-q4f16_1-MLC";
 
-// Same request as chat() in ollama.ts, with the prompt from rag.ts.
+let chat: Promise<MLCEngine> | undefined;
+
+// Loads the model once; later calls reuse it (same reason as openStore).
+export function loadChat(onProgress?: (report: InitProgressReport) => void) {
+  chat ??= CreateMLCEngine(CHAT_MODEL, { initProgressCallback: onProgress });
+  return chat;
+}
+
+// Same prompt as rag-eval.ts (rag.ts). Streams the reply: onReply gets the
+// text so far after every chunk. The last chunk carries WebLLM's usage
+// (prefill / decode tok/s, time to first token), like in spike.ts (stage 8).
+// No enable_thinking: Llama 3.2 doesn't think (see stage 8).
 export async function answer(
   question: string,
   passages: Passage[],
-  model: string,
+  onReply: (reply: string) => void,
 ) {
-  const { choices } = ChatResponse.parse(
-    await postJson("/ollama/v1/chat/completions", {
-      model,
-      messages: buildMessages(question, passages),
-      reasoning_effort: "none",
-      temperature: 0,
-    }),
-  );
+  const engine = await loadChat();
 
-  const reply = choices[0]?.message.content ?? "";
-  return { reply, cited: citedPassages(reply, passages) };
+  const chunks = await engine.chat.completions.create({
+    messages: buildMessages(question, passages),
+    temperature: 0,
+    stream: true,
+    stream_options: { include_usage: true },
+  });
+
+  let reply = "";
+  let usage: CompletionUsage | undefined;
+
+  for await (const chunk of chunks) {
+    reply += chunk.choices[0]?.delta.content ?? "";
+    onReply(reply);
+    if (chunk.usage) usage = chunk.usage;
+  }
+
+  return { reply, cited: citedPassages(reply, passages), usage };
 }

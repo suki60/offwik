@@ -2,9 +2,10 @@ import { type FormEvent, useEffect, useState } from "react";
 import type { Passage } from "../rag.ts";
 import {
   answer,
+  CHAT_MODEL,
   embedQuery,
+  loadChat,
   loadEmbedder,
-  MODELS,
   search,
 } from "./pipeline.ts";
 import { runSearchEval } from "./search-eval.ts";
@@ -12,12 +13,12 @@ import { openStore } from "./store.ts";
 
 // Stage 7, step 4: ask a question, see the answer with its citations and the
 // passages it was given. Each question is one "turn" that moves through
-// searching → answering → done (or error).
+// searching → answering → done (or error). Since stage 10 the reply streams
+// in while the turn is "answering".
 
 type Turn = {
   id: string;
   question: string;
-  model: string;
   status: "searching" | "answering" | "done" | "error";
   passages: Passage[];
   reply: string;
@@ -25,11 +26,16 @@ type Turn = {
   error: string;
   // Milliseconds per step, to see where the time goes.
   // hamming is the part of search spent on the Hamming scan (stage 9).
+  // firstToken, prefill and decode come from WebLLM's usage (stage 10):
+  // seconds to the first token, prompt and reply speed in tokens/s.
   timings: {
     embed?: number;
     search?: number;
     hamming?: number;
     answer?: number;
+    firstToken?: number;
+    prefill?: number;
+    decode?: number;
   };
 };
 
@@ -37,7 +43,6 @@ export function App() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [turns, setTurns] = useState<Turn[]>([]);
   const [question, setQuestion] = useState("");
-  const [model, setModel] = useState(MODELS[0] ?? "");
   const [dataStatus, setDataStatus] = useState("Opening the search data…");
   const [isReady, setIsReady] = useState(false);
 
@@ -50,7 +55,9 @@ export function App() {
   // Stage 9: the search data lives in OPFS. The first visit copies it there
   // (~610 MB, with progress); later visits only open it. Then the embedding
   // model: downloaded on the first visit (~275 MB), from the browser cache
-  // after that. Its load time shows how long a cold start takes.
+  // after that. Then the chat model (stage 10): ~695 MB on the first visit,
+  // from WebLLM's cache after that. Their load times show how long a cold
+  // start takes.
   useEffect(() => {
     async function load() {
       await openStore((copied, total) =>
@@ -72,6 +79,14 @@ export function App() {
 
       console.log(
         `Embedding model loaded in ${(performance.now() - start).toFixed(0)} ms`,
+      );
+
+      setDataStatus("Loading the chat model…");
+      const chatStart = performance.now();
+      await loadChat((report) => setDataStatus(report.text));
+
+      console.log(
+        `Chat model loaded in ${(performance.now() - chatStart).toFixed(0)} ms`,
       );
 
       setIsReady(true);
@@ -120,7 +135,6 @@ export function App() {
       {
         id,
         question: text,
-        model,
         status: "searching",
         passages: [],
         reply: "",
@@ -146,7 +160,10 @@ export function App() {
       });
 
       start = performance.now();
-      const { reply, cited } = await answer(text, passages, model);
+
+      const { reply, cited, usage } = await answer(text, passages, (reply) =>
+        update(id, { reply }),
+      );
 
       update(id, {
         status: "done",
@@ -157,6 +174,9 @@ export function App() {
           search: searchMs,
           hamming: hammingMs,
           answer: performance.now() - start,
+          firstToken: usage?.extra.time_to_first_token_s,
+          prefill: usage?.extra.prefill_tokens_per_s,
+          decode: usage?.extra.decode_tokens_per_s,
         },
       });
     } catch (error) {
@@ -191,15 +211,6 @@ export function App() {
           onChange={(event) => setQuestion(event.target.value)}
           placeholder="Ask about Simple English Wikipedia…"
         />
-        <select
-          name="model"
-          value={model}
-          onChange={(event) => setModel(event.target.value)}
-        >
-          {MODELS.map((name) => (
-            <option key={name}>{name}</option>
-          ))}
-        </select>
         <button type="submit" disabled={isBusy || !isReady}>
           Ask
         </button>
@@ -227,13 +238,17 @@ export function App() {
 }
 
 function TurnView({ turn }: { turn: Turn }) {
-  const { embed, search, hamming, answer } = turn.timings;
+  const { embed, search, hamming, answer, firstToken, prefill, decode } =
+    turn.timings;
 
   const timings = [
     embed && `embed ${embed.toFixed(0)} ms`,
     search &&
       `search ${search.toFixed(0)} ms (hamming ${hamming?.toFixed(0)} ms)`,
     answer && `answer ${answer.toFixed(0)} ms`,
+    firstToken && `first token ${firstToken.toFixed(2)} s`,
+    prefill && `prefill ${prefill.toFixed(0)} tok/s`,
+    decode && `decode ${decode.toFixed(1)} tok/s`,
   ]
     .filter(Boolean)
     .join(" · ");
@@ -249,11 +264,11 @@ function TurnView({ turn }: { turn: Turn }) {
     <section className="turn">
       <div className="question">{turn.question}</div>
       <div className="meta">
-        {turn.model}
+        {CHAT_MODEL}
         {timings && ` · ${timings}`}
       </div>
       {turn.status === "searching" && <p>Searching…</p>}
-      {turn.status === "answering" && <p>Answering…</p>}
+      {turn.status === "answering" && <p>{turn.reply || "Answering…"}</p>}
       {turn.status === "error" && <p className="error">{turn.error}</p>}
       {turn.status === "done" && (
         <>

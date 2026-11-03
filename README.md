@@ -40,10 +40,10 @@ To start over from scratch: `docker compose down -v` (deletes the database volum
 npm run rag-eval                          # 48 gold questions with retrieval
 CHAT_MODEL=qwen3.5:9b npm run rag-eval    # same, another model
 npm run search-eval [-- <candidates>]     # file search vs pgvector, recall@5
-npm run dev                               # web app on :5173 (needs Ollama)
+npm run dev                               # web app on :5173 (WebGPU browser)
 ```
 
-The web app embeds and searches in the browser: on the first visit it copies `public/data/` into the browser's storage (OPFS) and downloads the embedding model (~275 MB). Only the answer still goes to Ollama. With `certs/` present it serves HTTPS, so the browser must trust the CA that signed `certs/cert.pem`.
+The web app embeds and searches in the browser: on the first visit it copies `public/data/` into the browser's storage (OPFS) and downloads the embedding model (~275 MB) and the chat model (WebLLM, Llama 3.2 1B, ~695 MB). Nothing goes to Ollama. With `certs/` present it serves HTTPS, so the browser must trust the CA that signed `certs/cert.pem`.
 
 ## Layout
 
