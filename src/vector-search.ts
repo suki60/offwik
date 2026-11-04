@@ -9,7 +9,9 @@
 //    length 1, so the dot product ranks like cosine; the int8 scale is the same
 //    for every row and doesn't change the order either.
 
-export const DIMS = 768;
+// snowflake-arctic-embed-s vectors since stage 10 (was nomic-embed-text,
+// 768). Shared with export.ts, so the files and the search always agree.
+export const DIMS = 384;
 export const WORDS = DIMS / 32;
 
 // Same packing as export.ts: bit d of the vector is bit (d % 32) of word
@@ -36,7 +38,7 @@ function popcount(word: number) {
 }
 
 // The n rows whose sign bits differ least from the query's, closest first.
-// Distances are only 0..768, so instead of sorting 370k numbers: count how
+// Distances are only 0..DIMS, so instead of sorting 370k numbers: count how
 // many rows have each distance, then walk up from 0 to find the cutoff.
 export function hammingTopN(bits: Uint32Array, qBits: Uint32Array, n: number) {
   const count = bits.length / WORDS;

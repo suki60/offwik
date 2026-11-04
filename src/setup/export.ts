@@ -1,32 +1,35 @@
 import { existsSync, readFileSync } from "node:fs";
 import { mkdir, open, writeFile } from "node:fs/promises";
 import { connect } from "../db.ts";
+import { DIMS, WORDS } from "../vector-search.ts";
 
 // Stage 9, step 2: export chunks + vectors from Postgres into flat files the
 // browser can search without a server. Row i is the same chunk in every file:
-// - vectors.bin  96 bytes/row: 768 sign bits (bit d = 1 when value d > 0),
-//                packed into 24 Uint32 words, for the fast first pass
-// - vectors.i8   768 bytes/row: Int8 values, round(x / scale * 127), for
+// - vectors.bin  DIMS / 8 bytes/row: DIMS sign bits (bit d = 1 when value
+//                d > 0), packed into WORDS Uint32 words, for the fast first pass
+// - vectors.i8   DIMS bytes/row: Int8 values, round(x / scale * 127), for
 //                rescoring the candidates
+// Since stage 10 the vectors are snowflake-arctic-embed-s (embedding_arctic,
+// DIMS 384): the embedder WebLLM runs next to Llama on the phone. Before:
+// nomic-embed-text (embedding_nomic, 768).
 // - text.bin     UTF-8 JSON records {title, url, content}, back to back
 // - offsets.bin  Uint32 × (count + 1): record i is bytes
 //                [offsets[i], offsets[i + 1]) of text.bin
 // - meta.json    { count, dims, scale }
 // Vite serves public/ as is, so the page fetches /data/vectors.bin etc.
-// Setup step 5: skipped when meta.json already counts every embedded chunk.
+// Setup step 5: skipped when meta.json already counts every embedded chunk
+// with the same number of dimensions (a nomic export has 768).
 // To export again (e.g. after re-embedding): rm -r public/data
 // Usage: npm run export
 
 const DIR = "public/data";
-const DIMS = 768;
-const WORDS = DIMS / 32;
 const PAGE = 5_000;
 
 const db = await connect();
 
 async function embeddedCount() {
   const { rows } = await db.query<{ count: number }>(
-    "SELECT count(*) FROM chunks WHERE embedding_nomic IS NOT NULL",
+    "SELECT count(*) FROM chunks WHERE embedding_arctic IS NOT NULL",
   );
 
   return rows[0]?.count ?? 0;
@@ -38,8 +41,8 @@ async function embeddedCount() {
 async function maxAbs() {
   const { rows } = await db.query<{ scale: number }>(
     `SELECT max(abs(x)) AS scale
-     FROM chunks, unnest(embedding_nomic::real[]) AS x
-     WHERE embedding_nomic IS NOT NULL`,
+     FROM chunks, unnest(embedding_arctic::real[]) AS x
+     WHERE embedding_arctic IS NOT NULL`,
   );
 
   return rows[0]?.scale ?? 1;
@@ -48,7 +51,7 @@ async function maxAbs() {
 if (existsSync(`${DIR}/meta.json`)) {
   const meta = JSON.parse(readFileSync(`${DIR}/meta.json`, "utf8"));
 
-  if (meta.count === (await embeddedCount())) {
+  if (meta.dims === DIMS && meta.count === (await embeddedCount())) {
     console.log(`${DIR} already holds all ${meta.count} rows, nothing to do.`);
     await db.end();
     process.exit(0);
@@ -79,10 +82,10 @@ while (true) {
   // Keyset paging: continue after the last id instead of OFFSET, which would
   // re-read every skipped row and get slower page after page.
   const { rows } = await db.query<Row>(
-    `SELECT c.id, a.title, a.url, c.content, c.embedding_nomic AS embedding
+    `SELECT c.id, a.title, a.url, c.content, c.embedding_arctic AS embedding
      FROM chunks c
      JOIN articles a ON a.id = c.article_id
-     WHERE c.embedding_nomic IS NOT NULL AND c.id > $1
+     WHERE c.embedding_arctic IS NOT NULL AND c.id > $1
      ORDER BY c.id
      LIMIT $2`,
     [lastId, PAGE],

@@ -1,6 +1,6 @@
 import { open, readFile } from "node:fs/promises";
-import { pipeline } from "@huggingface/transformers";
 import { connect } from "../db.ts";
+import { embed } from "../ollama.ts";
 import { search } from "../search.ts";
 import { DIMS, dot, hammingTopN, rescore, toBits } from "../vector-search.ts";
 import { questions } from "./questions.ts";
@@ -8,16 +8,22 @@ import { questions } from "./questions.ts";
 // Stage 9, step 3: does the file search (vector-search.ts over public/data,
 // written by setup/export.ts) find the right articles as often as pgvector?
 // Recall@5 at article level: is the expected article among the top 5 chunks?
-// Rankings compared, per query embedding dtype (fp16 = Ollama's vectors
-// exactly, q8 = smaller download, cosine ~0.97 with Ollama in step 1):
-// - pgvector:      HNSW, ef_search 1000 (the Mac app), fp16 query only
-// - binary:        Hamming distance only, top 5
-// - binary + int8: Hamming top N candidates, int8 rescore to 5 (the phone)
-// - exact int8:    int8 dot product with every row (upper bound for the above)
+// Stage 10: public/data holds snowflake-arctic-embed-s vectors (the phone's
+// embedder), pgvector's HNSW index still nomic-embed-text: does the smaller
+// model find what nomic found? Query vectors come from Ollama for both.
+// Rankings compared:
+// - pgvector nomic:  HNSW over embedding_nomic, ef_search 1000 (the reference;
+//                    nomic's file search found 48/48 in stage 9)
+// - binary:          arctic, Hamming distance only, top 5
+// - binary + int8:   arctic, Hamming top N candidates, int8 rescore to 5
+//                    (the phone)
+// - exact int8:      arctic, int8 dot product with every row (upper bound for
+//                    the above)
 // Usage: npm run search-eval [-- <candidates>]   (default 200)
 
-const MODEL = "nomic-ai/nomic-embed-text-v1.5";
-const DTYPES = ["fp16", "q8"] as const;
+// Arctic prefixes only queries (model card); nomic prefixes both sides.
+const ARCTIC_PREFIX =
+  "Represent this sentence for searching relevant passages: ";
 const DIR = "public/data";
 const K = 5;
 const CANDIDATES = Number(process.argv[2] ?? 200);
@@ -74,7 +80,6 @@ function exactTopK(q: number[], k: number) {
   return best.map(({ row }) => row);
 }
 
-const texts = questions.map(({ question }) => `search_query: ${question}`);
 const hits: Record<string, number> = {};
 const misses: string[] = [];
 let hammingMs = 0;
@@ -89,43 +94,42 @@ function tally(method: string, titles: string[], index: number) {
   }
 }
 
-for (const dtype of DTYPES) {
-  const extractor = await pipeline("feature-extraction", MODEL, { dtype });
-  const output = await extractor(texts, { pooling: "mean", normalize: true });
-  const vectors: number[][] = output.tolist();
-  await extractor.dispose();
+// One embeddings request per model for all 48 questions.
+const nomicVectors = await embed(
+  questions.map(({ question }) => `search_query: ${question}`),
+);
 
-  for (const [i, q] of vectors.entries()) {
-    if (dtype === "fp16") {
-      const passages = await search(db, q, K);
+const arcticVectors = await embed(
+  questions.map(({ question }) => `${ARCTIC_PREFIX}${question}`),
+  "snowflake-arctic-embed:33m",
+);
 
-      tally(
-        "pgvector",
-        passages.map(({ title }) => title),
-        i,
-      );
-    }
+for (const [i, q] of arcticVectors.entries()) {
+  const passages = await search(db, nomicVectors[i] ?? [], K);
 
-    const hammingStart = performance.now();
-    const candidates = hammingTopN(bits, toBits(q), CANDIDATES);
-    hammingMs += performance.now() - hammingStart;
-    const rescoreStart = performance.now();
-    const top = await rescore(candidates, readRow, q, K);
-    rescoreMs += performance.now() - rescoreStart;
-    const binary = candidates.slice(0, K);
-    const exact = exactTopK(q, K);
-    tally(`binary ${dtype}`, await Promise.all(binary.map(readTitle)), i);
-    tally(`binary+int8 ${dtype}`, await Promise.all(top.map(readTitle)), i);
-    tally(`exact int8 ${dtype}`, await Promise.all(exact.map(readTitle)), i);
-  }
+  tally(
+    "pgvector nomic",
+    passages.map(({ title }) => title),
+    i,
+  );
 
-  console.log(`${dtype} done`);
+  const hammingStart = performance.now();
+  const candidates = hammingTopN(bits, toBits(q), CANDIDATES);
+  hammingMs += performance.now() - hammingStart;
+  const rescoreStart = performance.now();
+  const top = await rescore(candidates, readRow, q, K);
+  rescoreMs += performance.now() - rescoreStart;
+  const binary = candidates.slice(0, K);
+  const exact = exactTopK(q, K);
+  tally("binary", await Promise.all(binary.map(readTitle)), i);
+  tally("binary+int8", await Promise.all(top.map(readTitle)), i);
+  tally("exact int8", await Promise.all(exact.map(readTitle)), i);
 }
 
 await i8File.close();
 await textFile.close();
 await db.end();
-const queries = questions.length * DTYPES.length;
+const queries = questions.length;
 console.log(`\n${misses.join("\n")}\n`);
 console.log(`recall@${K} (${questions.length} questions, ${count} rows):`);
 

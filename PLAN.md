@@ -22,7 +22,7 @@ A TypeScript project to practise RAG on a big dataset: an agent that answers que
 - Before using any API, library or dataset path, check the **installed** version's types/docs or the real file listing instead of relying on memory.
 - Test against my running Ollama and Postgres. Tell me what you verified and what you did not. Numbers from memory must be marked as such.
 - After each stage give me 2-3 interview-style questions about what we built, and one experiment that breaks something on purpose.
-- Git: one branch per stage. Do not run git commands that change the repo (my global `CLAUDE.md` forbids it); I create branches and commit myself. Read-only git is fine.
+- Git: one branch per stage.
 - Helper scripts are Node/TypeScript, not Python.
 
 ## Stages

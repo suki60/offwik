@@ -102,7 +102,7 @@ async function open(onProgress?: Progress): Promise<Store> {
 
   return {
     bits,
-    // Row i of vectors.i8 is bytes [i × 768, (i + 1) × 768).
+    // Row i of vectors.i8 is bytes [i × DIMS, (i + 1) × DIMS).
     readRow: async (row) =>
       new Int8Array(
         await i8File.slice(row * DIMS, (row + 1) * DIMS).arrayBuffer(),
