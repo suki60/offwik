@@ -11,8 +11,8 @@ export async function search(db: pg.Client, vector: number[], k: number) {
     `SELECT a.title, a.url, c.content
      FROM chunks c
      JOIN articles a ON a.id = c.article_id
-     WHERE c.embedding IS NOT NULL
-     ORDER BY c.embedding <=> $1::vector
+     WHERE c.embedding_nomic IS NOT NULL
+     ORDER BY c.embedding_nomic <=> $1::vector
      LIMIT $2`,
     [JSON.stringify(vector), k],
   );

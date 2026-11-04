@@ -46,11 +46,17 @@ await db.query(`
   CREATE TABLE IF NOT EXISTS chunks (
     id serial PRIMARY KEY,
     article_id integer NOT NULL REFERENCES articles (id) ON DELETE CASCADE,
-    position integer NOT NULL, -- order of the chunk inside its article
-    content text NOT NULL,     -- title + text: what gets embedded
-    embedding vector(768),     -- filled by embed.ts
+    position integer NOT NULL,   -- order of the chunk inside its article
+    content text NOT NULL,       -- title + text: what gets embedded
+    embedding_nomic vector(768), -- nomic-embed-text, filled by embed.ts
     UNIQUE (article_id, position)
   );
+  -- Stage 10: snowflake-arctic-embed-s, the embedder WebLLM can run next to
+  -- Llama on the phone. Filled by embed.ts. ADD COLUMN IF NOT EXISTS: also
+  -- adds it to a database created before stage 10, without touching the rest.
+  -- (Before stage 10 embedding_nomic was called embedding: renamed by hand
+  -- with ALTER TABLE chunks RENAME COLUMN embedding TO embedding_nomic.)
+  ALTER TABLE chunks ADD COLUMN IF NOT EXISTS embedding_arctic vector(384);
 `);
 
 // Bulk loading (stage 4): each batch of articles takes 2 queries, Postgres

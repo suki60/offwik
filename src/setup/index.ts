@@ -1,10 +1,10 @@
 import { connect } from "../db.ts";
 
-// Setup step 4: build the HNSW index on chunks.embedding, after all rows are
+// Setup step 4: build the HNSW index on chunks.embedding_nomic, after all rows are
 // embedded. Building once over the full table is much faster than keeping the
 // index up to date during thousands of updates. Skips the build when the index
 // already exists. To rebuild (e.g. with other settings), drop it by hand:
-//   docker compose exec db psql -U wiki -c "DROP INDEX chunks_embedding_idx"
+//   docker compose exec db psql -U wiki -c "DROP INDEX chunks_embedding_nomic_idx"
 // Expect ~1,448 MB and a few minutes.
 // Usage: npm run index
 
@@ -26,11 +26,13 @@ const db = await connect();
 
 // to_regclass() returns NULL when no table/index has that name.
 const { rowCount } = await db.query(
-  "SELECT 1 WHERE to_regclass('chunks_embedding_idx') IS NOT NULL",
+  "SELECT 1 WHERE to_regclass('chunks_embedding_nomic_idx') IS NOT NULL",
 );
 
 if (rowCount) {
-  console.log("Index chunks_embedding_idx already exists, nothing to do.");
+  console.log(
+    "Index chunks_embedding_nomic_idx already exists, nothing to do.",
+  );
   await db.end();
   process.exit(0);
 }
@@ -57,8 +59,8 @@ const start = performance.now();
 // searches order by. WITH (...) doesn't take bind parameters either: M and
 // EF_CONSTRUCTION are constants above.
 await db.query(`
-  CREATE INDEX chunks_embedding_idx ON chunks
-  USING hnsw (embedding vector_cosine_ops)
+  CREATE INDEX chunks_embedding_nomic_idx ON chunks
+  USING hnsw (embedding_nomic vector_cosine_ops)
   WITH (m = ${M}, ef_construction = ${EF_CONSTRUCTION})
 `);
 
@@ -66,8 +68,8 @@ const seconds = (performance.now() - start) / 1000;
 
 const { rows } = await db.query(`
   SELECT
-    pg_size_pretty(pg_relation_size('chunks_embedding_idx')) AS index_size,
-    (SELECT count(*) FROM chunks WHERE embedding IS NOT NULL) AS vectors
+    pg_size_pretty(pg_relation_size('chunks_embedding_nomic_idx')) AS index_size,
+    (SELECT count(*) FROM chunks WHERE embedding_nomic IS NOT NULL) AS vectors
 `);
 
 const { index_size, vectors } = rows[0];

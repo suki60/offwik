@@ -14,11 +14,16 @@ const EmbeddingsResponse = z.object({
 });
 
 // One HTTP request for the whole batch: `input` takes an array of strings.
-export async function embed(texts: string[]): Promise<number[][]> {
+// model: nomic-embed-text (768 dims) or, since stage 10,
+// snowflake-arctic-embed:33m (384 dims).
+export async function embed(
+  texts: string[],
+  model = "nomic-embed-text",
+): Promise<number[][]> {
   const response = await fetch(`${ollamaUrl}/embeddings`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ model: "nomic-embed-text", input: texts }),
+    body: JSON.stringify({ model, input: texts }),
   });
 
   // fetch only rejects on network errors: HTTP errors have to be checked by hand.

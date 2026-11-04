@@ -26,7 +26,7 @@ const db = await connect();
 
 async function embeddedCount() {
   const { rows } = await db.query<{ count: number }>(
-    "SELECT count(*) FROM chunks WHERE embedding IS NOT NULL",
+    "SELECT count(*) FROM chunks WHERE embedding_nomic IS NOT NULL",
   );
 
   return rows[0]?.count ?? 0;
@@ -38,8 +38,8 @@ async function embeddedCount() {
 async function maxAbs() {
   const { rows } = await db.query<{ scale: number }>(
     `SELECT max(abs(x)) AS scale
-     FROM chunks, unnest(embedding::real[]) AS x
-     WHERE embedding IS NOT NULL`,
+     FROM chunks, unnest(embedding_nomic::real[]) AS x
+     WHERE embedding_nomic IS NOT NULL`,
   );
 
   return rows[0]?.scale ?? 1;
@@ -79,10 +79,10 @@ while (true) {
   // Keyset paging: continue after the last id instead of OFFSET, which would
   // re-read every skipped row and get slower page after page.
   const { rows } = await db.query<Row>(
-    `SELECT c.id, a.title, a.url, c.content, c.embedding
+    `SELECT c.id, a.title, a.url, c.content, c.embedding_nomic AS embedding
      FROM chunks c
      JOIN articles a ON a.id = c.article_id
-     WHERE c.embedding IS NOT NULL AND c.id > $1
+     WHERE c.embedding_nomic IS NOT NULL AND c.id > $1
      ORDER BY c.id
      LIMIT $2`,
     [lastId, PAGE],

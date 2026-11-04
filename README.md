@@ -8,6 +8,7 @@ RAG over an offline copy of Simple English Wikipedia, with local models (Ollama)
 - Models:
   ```
   ollama pull nomic-embed-text
+  ollama pull snowflake-arctic-embed:33m
   ollama pull llama3.2:1b
   ollama pull qwen3.5:0.8b  # optional, for comparisons
   ollama pull qwen3.5:9b    # optional, for comparisons
@@ -28,7 +29,7 @@ npm run setup
 | --- | --- | --- |
 | `npm run download` | Downloads the Parquet dump (pinned revision) to `data/`, checks its sha256 | 157 MB, "sha256 matches" |
 | `npm run load` | Chunks every article into the `articles` + `chunks` tables | 238,243 articles, 370,859 chunks |
-| `npm run embed` | Embeds every chunk with `nomic-embed-text` (resumable) | ~50 min at ~125 chunks/s |
+| `npm run embed` | Embeds every chunk with `nomic-embed-text`, then `snowflake-arctic-embed:33m` (resumable) | ~50 min at ~125 chunks/s (nomic) + arctic (not measured yet) |
 | `npm run index` | Builds the HNSW index (m 16, ef_construction 128) | ~1,448 MB, a few minutes |
 | `npm run export` | Writes chunks + binary/int8 vectors to `public/data/` for the web app | 4 files, 609.5 MB |
 
