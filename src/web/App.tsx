@@ -1,11 +1,10 @@
-import { type FormEvent, useEffect, useState } from "react";
+import { type FormEvent, useState } from "react";
 import type { Passage } from "../rag.ts";
 import {
   answer,
   CHAT_MODEL,
   embedQuery,
-  loadChat,
-  loadEmbedder,
+  loadModels,
   search,
 } from "./pipeline.ts";
 import { runSearchEval } from "./search-eval.ts";
@@ -43,7 +42,8 @@ export function App() {
   const [theme, setTheme] = useState<"light" | "dark">("dark");
   const [turns, setTurns] = useState<Turn[]>([]);
   const [question, setQuestion] = useState("");
-  const [dataStatus, setDataStatus] = useState("Opening the search data…");
+  const [dataStatus, setDataStatus] = useState("");
+  const [isStarted, setIsStarted] = useState(false);
   const [isReady, setIsReady] = useState(false);
 
   const isBusy = turns.some(
@@ -52,49 +52,37 @@ export function App() {
 
   const [evalStatus, setEvalStatus] = useState("");
 
-  // Stage 9: the search data lives in OPFS. The first visit copies it there
-  // (~610 MB, with progress); later visits only open it. Then the embedding
-  // model: downloaded on the first visit (~275 MB), from the browser cache
-  // after that. Then the chat model (stage 10): ~695 MB on the first visit,
-  // from WebLLM's cache after that. Their load times show how long a cold
-  // start takes.
-  useEffect(() => {
-    async function load() {
+  // Stage 10: nothing loads until Start is clicked, so a Web Inspector
+  // timeline can be recorded from 0 s. Stage 9: the search data lives in
+  // OPFS. The first visit copies it there (~449 MB, with progress); later
+  // visits only open it. Then both models into one WebLLM engine: ~0.9 GB on
+  // the first visit, from WebLLM's cache after that. The load time shows how
+  // long a cold start takes.
+  async function load() {
+    setIsStarted(true);
+    setDataStatus("Opening the search data…");
+
+    try {
       await openStore((copied, total) =>
         setDataStatus(
           `Copying the search data… ${(copied / 1e6).toFixed(0)} / ${(total / 1e6).toFixed(0)} MB`,
         ),
       );
 
-      setDataStatus("Loading the embedding model…");
+      setDataStatus("Loading the models…");
       const start = performance.now();
-
-      await loadEmbedder((info) => {
-        if (info.status === "progress") {
-          setDataStatus(
-            `Loading the embedding model… ${info.file} ${info.progress.toFixed(0)}%`,
-          );
-        }
-      });
+      await loadModels((report) => setDataStatus(report.text));
 
       console.log(
-        `Embedding model loaded in ${(performance.now() - start).toFixed(0)} ms`,
-      );
-
-      setDataStatus("Loading the chat model…");
-      const chatStart = performance.now();
-      await loadChat((report) => setDataStatus(report.text));
-
-      console.log(
-        `Chat model loaded in ${(performance.now() - chatStart).toFixed(0)} ms`,
+        `Models loaded in ${(performance.now() - start).toFixed(0)} ms`,
       );
 
       setIsReady(true);
       setDataStatus("");
+    } catch (error) {
+      setDataStatus(`Loading error: ${error}`);
     }
-
-    load().catch((error) => setDataStatus(`Loading error: ${error}`));
-  }, []);
+  }
 
   // The 48 gold questions through embedQuery + search only (search-eval.ts).
   async function evaluate() {
@@ -215,6 +203,13 @@ export function App() {
           Ask
         </button>
       </form>
+      {!isStarted && (
+        <p className="meta">
+          <button type="button" onClick={load}>
+            Start
+          </button>
+        </p>
+      )}
       {dataStatus && <p className="meta">{dataStatus}</p>}
       <p className="meta">
         <button

@@ -31,7 +31,7 @@ npm run setup
 | `npm run load` | Chunks every article into the `articles` + `chunks` tables | 238,243 articles, 370,859 chunks |
 | `npm run embed` | Embeds every chunk with `nomic-embed-text`, then `snowflake-arctic-embed:33m` (resumable) | ~50 min at ~125 chunks/s (nomic) + arctic (not measured yet) |
 | `npm run index` | Builds the HNSW index (m 16, ef_construction 128) | ~1,448 MB, a few minutes |
-| `npm run export` | Writes chunks + binary/int8 vectors to `public/data/` for the web app | 4 files, 609.5 MB |
+| `npm run export` | Writes chunks + binary/int8 vectors to `public/data/` for the web app | 4 files, 449.3 MB |
 
 To start over from scratch: `docker compose down -v` (deletes the database volume), then `docker compose up -d` and `npm run setup`.
 

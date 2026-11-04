@@ -6,7 +6,7 @@ import { DIMS, WORDS } from "../vector-search.ts";
 // after reloads, with real files that can be read at an offset.
 // - First visit: each file is streamed from /data/ (Vite serves public/) into
 //   OPFS, never held in memory as a whole.
-// - Every visit: vectors.bin (36 MB) and offsets.bin (1.5 MB) go into memory
+// - Every visit: vectors.bin (17.8 MB) and offsets.bin (1.5 MB) go into memory
 //   for the Hamming scan; vectors.i8 and text.bin stay on disk and are read
 //   by slice: 200 int8 rows and 5 records per question.
 

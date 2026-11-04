@@ -19,7 +19,6 @@
   "private": true,
   "dependencies": {
     "@duckdb/node-api": "^1.5.6-r.2",
-    "@huggingface/transformers": "^4.3.2",
     "@mlc-ai/web-llm": "^0.2.86",
     "pg": "^8.23.1",
     "react": "^19.3.1",

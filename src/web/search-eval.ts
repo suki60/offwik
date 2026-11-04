@@ -3,8 +3,9 @@ import { embedQuery, search } from "./pipeline.ts";
 
 // Stage 9, step 4b: eval/search-eval.ts inside the page, with the app's own
 // embedQuery + search (no chat): recall@5 at article level, and the time per
-// step, one question at a time like a user asking. In Node: 48/48 with fp16
-// and 200 candidates, Hamming 9.4 ms per query.
+// step, one question at a time like a user asking. In Node with Ollama's
+// arctic (stage 10): 48/48 with 200 candidates, Hamming 6.0 ms per query.
+// The same score here means WebLLM's arctic matches Ollama's.
 
 export type SearchEvalResult = {
   hits: number;

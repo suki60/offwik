@@ -1,9 +1,4 @@
 import {
-  type FeatureExtractionPipeline,
-  type ProgressInfo,
-  pipeline,
-} from "@huggingface/transformers";
-import {
   type CompletionUsage,
   CreateMLCEngine,
   type InitProgressReport,
@@ -15,45 +10,58 @@ import { openStore } from "./store.ts";
 
 // Stage 7, step 4: the three steps of a RAG answer in the browser, each behind
 // its own function so later stages can swap one without touching the UI:
-// - embedQuery: transformers.js in the browser since stage 9 (was Ollama)
+// - embedQuery: WebLLM in the browser since stage 10 (transformers.js in
+//               stage 9, Ollama before)
 // - search:     inside the browser since stage 9 (was server.ts + pgvector)
 // - answer:     WebLLM in the browser since stage 10 (was Ollama)
 
 // Same k as rag-eval.ts, where this prompt scored 42/48 with llama3.2:1b.
 const K = 5;
 
-// Stage 9, step 4b: the query is embedded in the browser by transformers.js
-// (was Ollama's /v1/embeddings). Same model as the stored vectors, ONNX export.
-// dtype must be set: without it transformers.js picks q8 on wasm and fp32 on
-// WebGPU. fp16 gave Ollama's vectors exactly (cosine 1.0000, PLAN.md stage 9)
-// and 48/48 in search-eval.ts; q8 drifted (0.97) and lost one question.
-// The weights (~275 MB) are downloaded once and cached by the browser.
-const EMBED_MODEL = "nomic-ai/nomic-embed-text-v1.5";
+// Stage 10, step 1: the answer comes from WebLLM in the browser (was
+// Ollama). Same model as rag-eval.ts in Node (llama3.2:1b), WebLLM's 4-bit
+// build: ~695 MB download, ~879 MB GPU memory (stage 8).
+export const CHAT_MODEL = "Llama-3.2-1B-Instruct-q4f16_1-MLC";
 
-let embedder: Promise<FeatureExtractionPipeline> | undefined;
+// Stage 10, step 3: the query embedder runs in the same WebLLM engine as the
+// chat model. transformers.js + onnxruntime next to WebLLM went over the
+// iPhone's ~1.4 GB per-tab limit (PLAN.md stage 10). Same model as the
+// exported vectors (snowflake-arctic-embed:33m in Ollama), WebLLM's build
+// with batch size 4: ~239 MB GPU memory.
+const EMBED_MODEL = "snowflake-arctic-embed-s-q0f32-MLC-b4";
 
-// Loads the model once; later calls reuse it (same reason as openStore).
-export function loadEmbedder(onProgress?: (info: ProgressInfo) => void) {
-  embedder ??= pipeline("feature-extraction", EMBED_MODEL, {
-    dtype: "fp16",
-    device: "webgpu",
-    progress_callback: onProgress,
+let engine: Promise<MLCEngine> | undefined;
+
+// Loads both models once into one engine; later calls reuse it (same reason
+// as openStore). The weights are cached by WebLLM (Cache API) after the
+// first download.
+export function loadModels(onProgress?: (report: InitProgressReport) => void) {
+  engine ??= CreateMLCEngine([CHAT_MODEL, EMBED_MODEL], {
+    initProgressCallback: onProgress,
   });
 
-  return embedder;
+  return engine;
 }
 
-// Same prefix and pooling as eval/search-eval.ts: "search_query: " for queries,
-// mean over the tokens, then length 1.
-export async function embedQuery(question: string): Promise<number[]> {
-  const extractor = await loadEmbedder();
+// Same prefix as eval/search-eval.ts: arctic prefixes queries only.
+const QUERY_PREFIX =
+  "Represent this sentence for searching relevant passages: ";
 
-  const output = await extractor(`search_query: ${question}`, {
-    pooling: "mean",
-    normalize: true,
+// WebLLM returns the CLS vector without normalizing it (Ollama does). Not
+// needed here: Hamming only looks at signs, and the rescore ranks rows by dot
+// product with the query, so the query's length doesn't change the order.
+export async function embedQuery(question: string): Promise<number[]> {
+  const models = await loadModels();
+
+  // With two models in the engine, every request must say which one.
+  const { data } = await models.embeddings.create({
+    input: `${QUERY_PREFIX}${question}`,
+    model: EMBED_MODEL,
   });
 
-  return output.tolist()[0];
+  const vector = data[0]?.embedding;
+  if (!vector) throw new Error("No embedding returned");
+  return vector;
 }
 
 // Stage 9, step 4a: search the exported files in OPFS (store.ts) instead of
@@ -71,20 +79,6 @@ export async function search(vector: number[]) {
   return { passages, hammingMs };
 }
 
-// Stage 10, step 1: the answer comes from WebLLM in the browser (was
-// Ollama). Same model as rag-eval.ts in Node (llama3.2:1b), WebLLM's 4-bit
-// build: ~695 MB download, ~879 MB GPU memory (stage 8). The weights are
-// cached by WebLLM (Cache API) after the first download.
-export const CHAT_MODEL = "Llama-3.2-1B-Instruct-q4f16_1-MLC";
-
-let chat: Promise<MLCEngine> | undefined;
-
-// Loads the model once; later calls reuse it (same reason as openStore).
-export function loadChat(onProgress?: (report: InitProgressReport) => void) {
-  chat ??= CreateMLCEngine(CHAT_MODEL, { initProgressCallback: onProgress });
-  return chat;
-}
-
 // Same prompt as rag-eval.ts (rag.ts). Streams the reply: onReply gets the
 // text so far after every chunk. The last chunk carries WebLLM's usage
 // (prefill / decode tok/s, time to first token), like in spike.ts (stage 8).
@@ -94,9 +88,10 @@ export async function answer(
   passages: Passage[],
   onReply: (reply: string) => void,
 ) {
-  const engine = await loadChat();
+  const models = await loadModels();
 
-  const chunks = await engine.chat.completions.create({
+  const chunks = await models.chat.completions.create({
+    model: CHAT_MODEL,
     messages: buildMessages(question, passages),
     temperature: 0,
     stream: true,
