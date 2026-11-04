@@ -40,7 +40,7 @@ type Turn = {
 };
 
 export function App() {
-  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [theme, setTheme] = useState<"light" | "dark">("dark");
   const [turns, setTurns] = useState<Turn[]>([]);
   const [question, setQuestion] = useState("");
   const [dataStatus, setDataStatus] = useState("Opening the search data…");
