@@ -13,6 +13,11 @@ const hasCerts = existsSync("certs/key.pem") && existsSync("certs/cert.pem");
 // too, so the /ollama proxy is gone as well (see commit f95ccc9).
 export default defineConfig({
   plugins: [react()],
+  // Stage 10: dist/asset-manifest.json lists every file of the build, so the
+  // service worker (public/sw.js) can cache them all when it installs. Not
+  // the default .vite/manifest.json: `vite preview` doesn't serve dot folders.
+  build: { manifest: "asset-manifest.json" },
+  // `npm run preview` serves dist/ and reuses server's host and https.
   server: {
     // Listen on the Wi-Fi too (not only localhost), so the phone can connect.
     host: hasCerts,

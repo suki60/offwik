@@ -11,7 +11,8 @@
     "module": "esnext",
     "moduleResolution": "bundler",
     "lib": ["esnext", "dom", "dom.iterable"],
-    "types": [],
+    // vite/client: types for import.meta.env (main.tsx).
+    "types": ["vite/client"],
     "jsx": "react-jsx"
   },
   "include": [

@@ -63,6 +63,12 @@ export function App() {
     setDataStatus("Opening the search data…");
 
     try {
+      // Stage 10: asks the browser not to delete our data (OPFS + WebLLM's
+      // cache, ~1.4 GB) when space runs low. The browser decides on its own:
+      // false means it may still be evicted ("best effort").
+      const persisted = await navigator.storage.persist();
+      console.log(`Persistent storage: ${persisted}`);
+
       await openStore((copied, total) =>
         setDataStatus(
           `Copying the search data… ${(copied / 1e6).toFixed(0)} / ${(total / 1e6).toFixed(0)} MB`,

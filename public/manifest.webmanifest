@@ -1,0 +1,13 @@
+{
+  "name": "Wiki RAG",
+  "short_name": "Wiki RAG",
+  "description": "Ask Simple English Wikipedia, offline.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#121a16",
+  "theme_color": "#121a16",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

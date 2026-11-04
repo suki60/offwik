@@ -13,7 +13,9 @@
     "export": "tsx src/setup/export.ts",
     "rag-eval": "tsx src/eval/rag-eval.ts",
     "search-eval": "tsx src/eval/search-eval.ts",
-    "dev": "vite"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "type": "module",
   "private": true,
