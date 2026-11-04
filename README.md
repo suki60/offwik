@@ -29,7 +29,7 @@ npm run setup
 | --- | --- | --- |
 | `npm run download` | Downloads the Parquet dump (pinned revision) to `data/`, checks its sha256 | 157 MB, "sha256 matches" |
 | `npm run load` | Chunks every article into the `articles` + `chunks` tables | 238,243 articles, 370,859 chunks |
-| `npm run embed` | Embeds every chunk with `nomic-embed-text`, then `snowflake-arctic-embed:33m` (resumable) | ~50 min at ~125 chunks/s (nomic) + arctic (not measured yet) |
+| `npm run embed` | Embeds every chunk with `nomic-embed-text`, then `snowflake-arctic-embed:33m` (resumable) | ~50 min at ~125 chunks/s (nomic) + ~62 min at ~100 chunks/s (arctic) |
 | `npm run index` | Builds the HNSW index (m 16, ef_construction 128) | ~1,448 MB, a few minutes |
 | `npm run export` | Writes chunks + binary/int8 vectors to `public/data/` for the web app | 4 files, 449.3 MB |
 
