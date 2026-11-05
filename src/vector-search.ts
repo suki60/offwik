@@ -1,35 +1,28 @@
-// Stage 9, step 3: search the files written by setup/export.ts, without
-// Postgres. Shared by eval/search-eval.ts (Node) and, in step 4, the browser:
-// only the function that reads an int8 row differs between the two.
-// Two passes:
-// 1. hammingTopN: sign bits of the query vs. sign bits of every row (in
-//    memory), count the bits that differ, keep the n rows with the fewest.
-// 2. rescore: dot product of the float query with the int8 rows of those n
-//    candidates (read from disk), keep the k highest. The stored vectors have
-//    length 1, so the dot product ranks like cosine; the int8 scale is the same
-//    for every row and doesn't change the order either.
+// Search over the files written by setup/export.ts, without Postgres. Shared
+// by eval/search-eval.ts (Node) and the browser (web/pipeline.ts). Two passes:
+// 1. hammingTopN: sign bits of the query vs. sign bits of every row, keep the
+//    n rows where the fewest bits differ.
+// 2. rescore: dot product of the query with the int8 rows of those n
+//    candidates, keep the k highest.
 
-// snowflake-arctic-embed-s vectors since stage 10 (was nomic-embed-text,
-// 768). Shared with export.ts, so the files and the search always agree.
+// snowflake-arctic-embed-s vectors. WORDS: 32 sign bits per Uint32.
 export const DIMS = 384;
 export const WORDS = DIMS / 32;
 
-// Same packing as export.ts: bit d of the vector is bit (d % 32) of word
-// (d / 32), set when the value is above 0.
+// Bit d is set when value d is above 0 (same packing as export.ts).
 export function toBits(vector: number[]) {
   const bits = new Uint32Array(WORDS);
 
   for (let d = 0; d < DIMS; d++) {
-    const word = d >> 5;
-    if ((vector[d] ?? 0) > 0) bits[word] = (bits[word] ?? 0) | (1 << (d & 31));
+    if (vector[d] > 0) bits[d >> 5] |= 1 << (d & 31);
   }
 
   return bits;
 }
 
-// Number of 1 bits in a 32-bit word, without a loop over the bits: add
-// neighbouring bits in pairs, then the pairs in nibbles, then the nibbles in
-// bytes; the multiplication sums the 4 bytes into the top byte.
+// Number of 1 bits in a 32-bit word: add neighbouring bits in pairs, then
+// the pairs in nibbles, then the nibbles in bytes; the multiplication sums
+// the 4 bytes into the top byte.
 function popcount(word: number) {
   let x = word - ((word >>> 1) & 0x55555555);
   x = (x & 0x33333333) + ((x >>> 2) & 0x33333333);
@@ -38,8 +31,9 @@ function popcount(word: number) {
 }
 
 // The n rows whose sign bits differ least from the query's, closest first.
-// Distances are only 0..DIMS, so instead of sorting 370k numbers: count how
-// many rows have each distance, then walk up from 0 to find the cutoff.
+// Distances are only 0..DIMS, so instead of sorting all 370k rows: count the
+// rows per distance, find the cutoff distance that reaches n rows, and sort
+// only the rows up to it.
 export function hammingTopN(bits: Uint32Array, qBits: Uint32Array, n: number) {
   const count = bits.length / WORDS;
   const distances = new Uint16Array(count);
@@ -50,47 +44,36 @@ export function hammingTopN(bits: Uint32Array, qBits: Uint32Array, n: number) {
 
     // XOR: 1 where the signs differ, 32 dimensions per operation.
     for (let w = 0; w < WORDS; w++) {
-      distance += popcount((bits[i * WORDS + w] ?? 0) ^ (qBits[w] ?? 0));
+      distance += popcount(bits[i * WORDS + w] ^ qBits[w]);
     }
 
     distances[i] = distance;
-    histogram[distance] = (histogram[distance] ?? 0) + 1;
+    histogram[distance]++;
   }
 
-  // Smallest cutoff with at least n rows at or below it. `below` rows are
-  // strictly closer; the rest of the n are taken from the ties at the cutoff.
   let cutoff = 0;
-  let below = 0;
+  let total = histogram[0];
 
-  while (cutoff < DIMS && below + (histogram[cutoff] ?? 0) < n) {
-    below += histogram[cutoff] ?? 0;
+  while (total < n && cutoff < DIMS) {
     cutoff++;
+    total += histogram[cutoff];
   }
 
   const rows: number[] = [];
-  let ties = n - below;
 
   for (let i = 0; i < count; i++) {
-    const distance = distances[i] ?? DIMS;
-
-    if (distance < cutoff) {
-      rows.push(i);
-    } else if (distance === cutoff && ties > 0) {
-      rows.push(i);
-      ties--;
-    }
+    if (distances[i] <= cutoff) rows.push(i);
   }
 
-  return rows.sort((a, b) => (distances[a] ?? 0) - (distances[b] ?? 0));
+  // sort() is stable: ties stay in row order.
+  return rows.sort((a, b) => distances[a] - distances[b]).slice(0, n);
 }
 
-// Dot product of the float query with one int8 row, which starts at
-// `offset` in `data` (0 for a single row, i * DIMS for all rows in memory).
-export function dot(q: number[], data: Int8Array, offset = 0) {
+function dot(q: number[], row: Int8Array) {
   let sum = 0;
 
   for (let d = 0; d < DIMS; d++) {
-    sum += (q[d] ?? 0) * (data[offset + d] ?? 0);
+    sum += q[d] * row[d];
   }
 
   return sum;

@@ -10,10 +10,8 @@ import {
 import { runSearchEval } from "./search-eval.ts";
 import { openStore } from "./store.ts";
 
-// Stage 7, step 4: ask a question, see the answer with its citations and the
-// passages it was given. Each question is one "turn" that moves through
-// searching → answering → done (or error). Since stage 10 the reply streams
-// in while the turn is "answering".
+// Ask a question, see the answer with its citations and the passages it was
+// given. Each question is one "turn": searching → answering → done (or error).
 
 type Turn = {
   id: string;
@@ -23,76 +21,55 @@ type Turn = {
   reply: string;
   cited: Passage[];
   error: string;
-  // Milliseconds per step, to see where the time goes.
-  // hamming is the part of search spent on the Hamming scan (stage 9).
-  // firstToken, prefill and decode come from WebLLM's usage (stage 10):
-  // seconds to the first token, prompt and reply speed in tokens/s.
-  timings: {
-    embed?: number;
-    search?: number;
-    hamming?: number;
-    answer?: number;
-    firstToken?: number;
-    prefill?: number;
-    decode?: number;
-  };
+  // Where the time goes, shown under the question.
+  timings: string[];
 };
 
 export function App() {
   const [theme, setTheme] = useState<"light" | "dark">("dark");
   const [turns, setTurns] = useState<Turn[]>([]);
   const [question, setQuestion] = useState("");
-  const [dataStatus, setDataStatus] = useState("");
+  const [status, setStatus] = useState("");
   const [isStarted, setIsStarted] = useState(false);
   const [isReady, setIsReady] = useState(false);
+  const [evalStatus, setEvalStatus] = useState("");
+  const isEvaluating = evalStatus.endsWith("…");
 
   const isBusy = turns.some(
     (turn) => turn.status === "searching" || turn.status === "answering",
   );
 
-  const [evalStatus, setEvalStatus] = useState("");
-
-  // Stage 10: nothing loads until Start is clicked, so a Web Inspector
-  // timeline can be recorded from 0 s. Stage 9: the search data lives in
-  // OPFS. The first visit copies it there (~449 MB, with progress); later
-  // visits only open it. Then both models into one WebLLM engine: ~0.9 GB on
-  // the first visit, from WebLLM's cache after that. The load time shows how
-  // long a cold start takes.
-  async function load() {
+  // Nothing loads before Start, so a Web Inspector recording can begin at 0.
+  // First the search data (copied into OPFS on the first visit), then both
+  // models (downloaded on the first visit, from WebLLM's cache after that).
+  async function start() {
     setIsStarted(true);
-    setDataStatus("Opening the search data…");
 
     try {
-      // Stage 10: asks the browser not to delete our data (OPFS + WebLLM's
-      // cache, ~1.4 GB) when space runs low. The browser decides on its own:
-      // false means it may still be evicted ("best effort").
-      const persisted = await navigator.storage.persist();
-      console.log(`Persistent storage: ${persisted}`);
+      // Asks the browser not to delete our ~1.4 GB when space runs low. It
+      // decides on its own: false means "best effort".
+      console.log(`Persistent storage: ${await navigator.storage.persist()}`);
 
       await openStore((copied, total) =>
-        setDataStatus(
+        setStatus(
           `Copying the search data… ${(copied / 1e6).toFixed(0)} / ${(total / 1e6).toFixed(0)} MB`,
         ),
       );
 
-      setDataStatus("Loading the models…");
-      const start = performance.now();
-      await loadModels((report) => setDataStatus(report.text));
-
-      console.log(
-        `Models loaded in ${(performance.now() - start).toFixed(0)} ms`,
-      );
-
+      const startedAt = performance.now();
+      await loadModels((report) => setStatus(report.text));
+      const seconds = (performance.now() - startedAt) / 1000;
+      console.log(`Models loaded in ${seconds.toFixed(1)} s`);
       setIsReady(true);
-      setDataStatus("");
+      setStatus("");
     } catch (error) {
-      setDataStatus(`Loading error: ${error}`);
+      setStatus(`Loading error: ${error}`);
     }
   }
 
-  // The 48 gold questions through embedQuery + search only (search-eval.ts).
+  // The 48 gold questions through embedQuery + search only.
   async function evaluate() {
-    setEvalStatus("Search eval: 0/48…");
+    setEvalStatus("Search eval…");
 
     try {
       const result = await runSearchEval((done) =>
@@ -100,17 +77,15 @@ export function App() {
       );
 
       setEvalStatus(
-        `Search eval: ${result.hits}/${result.total} retrieved · per question: embed ${result.embedMs.toFixed(0)} ms · search ${result.searchMs.toFixed(0)} ms (hamming ${result.hammingMs.toFixed(0)} ms)${result.misses.map((miss) => `\n✗ ${miss}`).join("")}`,
+        `Search eval: ${result.hits}/${result.total} · per question: embed ${result.embedMs.toFixed(0)} ms · search ${result.searchMs.toFixed(0)} ms${result.misses.map((miss) => `\n✗ ${miss}`).join("")}`,
       );
     } catch (error) {
       setEvalStatus(`Search eval error: ${error}`);
     }
   }
 
-  const isEvaluating = evalStatus.endsWith("…");
-
-  // Merges changes into one turn. Functional update: always applies to the
-  // latest state, even after other updates happened in between.
+  // Merges changes into one turn. The functional update always applies to
+  // the latest state, even after other updates happened in between.
   function update(id: string, changes: Partial<Turn>) {
     setTurns((previous) =>
       previous.map((turn) => (turn.id === id ? { ...turn, ...changes } : turn)),
@@ -134,26 +109,19 @@ export function App() {
         reply: "",
         cited: [],
         error: "",
-        timings: {},
+        timings: [],
       },
       ...previous,
     ]);
 
     try {
-      let start = performance.now();
+      let startedAt = performance.now();
       const vector = await embedQuery(text);
-      const embedMs = performance.now() - start;
-      start = performance.now();
-      const { passages, hammingMs } = await search(vector);
-      const searchMs = performance.now() - start;
-
-      update(id, {
-        status: "answering",
-        passages,
-        timings: { embed: embedMs, search: searchMs, hamming: hammingMs },
-      });
-
-      start = performance.now();
+      const embed = `embed ${(performance.now() - startedAt).toFixed(0)} ms`;
+      startedAt = performance.now();
+      const passages = await search(vector);
+      const searched = `search ${(performance.now() - startedAt).toFixed(0)} ms`;
+      update(id, { status: "answering", passages, timings: [embed, searched] });
 
       const { reply, cited, usage } = await answer(text, passages, (reply) =>
         update(id, { reply }),
@@ -163,15 +131,12 @@ export function App() {
         status: "done",
         reply,
         cited,
-        timings: {
-          embed: embedMs,
-          search: searchMs,
-          hamming: hammingMs,
-          answer: performance.now() - start,
-          firstToken: usage?.extra.time_to_first_token_s,
-          prefill: usage?.extra.prefill_tokens_per_s,
-          decode: usage?.extra.decode_tokens_per_s,
-        },
+        timings: [
+          embed,
+          searched,
+          `first token ${usage?.extra.time_to_first_token_s.toFixed(2)} s`,
+          `decode ${usage?.extra.decode_tokens_per_s.toFixed(1)} tok/s`,
+        ],
       });
     } catch (error) {
       update(id, { status: "error", error: String(error) });
@@ -189,7 +154,6 @@ export function App() {
           className="theme-toggle"
           type="button"
           onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-          aria-label={`Switch to ${theme === "light" ? "dark" : "light"} theme`}
         >
           {theme === "light" ? "☾ Dark" : "☀ Light"}
         </button>
@@ -211,12 +175,12 @@ export function App() {
       </form>
       {!isStarted && (
         <p className="meta">
-          <button type="button" onClick={load}>
+          <button type="button" onClick={start}>
             Start
           </button>
         </p>
       )}
-      {dataStatus && <p className="meta">{dataStatus}</p>}
+      {status && <p className="meta">{status}</p>}
       <p className="meta">
         <button
           type="button"
@@ -239,23 +203,7 @@ export function App() {
 }
 
 function TurnView({ turn }: { turn: Turn }) {
-  const { embed, search, hamming, answer, firstToken, prefill, decode } =
-    turn.timings;
-
-  const timings = [
-    embed && `embed ${embed.toFixed(0)} ms`,
-    search &&
-      `search ${search.toFixed(0)} ms (hamming ${hamming?.toFixed(0)} ms)`,
-    answer && `answer ${answer.toFixed(0)} ms`,
-    firstToken && `first token ${firstToken.toFixed(2)} s`,
-    prefill && `prefill ${prefill.toFixed(0)} tok/s`,
-    decode && `decode ${decode.toFixed(1)} tok/s`,
-  ]
-    .filter(Boolean)
-    .join(" · ");
-
-  // One link per article: the reply can cite two chunks of the same article
-  // ([1] and [2] both Barcelona), which share a URL and would share a key.
+  // One link per article: two cited chunks of the same article share a URL.
   const sources = turn.cited.filter(
     (passage, i) =>
       turn.cited.findIndex(({ url }) => url === passage.url) === i,
@@ -264,10 +212,7 @@ function TurnView({ turn }: { turn: Turn }) {
   return (
     <section className="turn">
       <div className="question">{turn.question}</div>
-      <div className="meta">
-        {CHAT_MODEL}
-        {timings && ` · ${timings}`}
-      </div>
+      <div className="meta">{[CHAT_MODEL, ...turn.timings].join(" · ")}</div>
       {turn.status === "searching" && <p>Searching…</p>}
       {turn.status === "answering" && <p>{turn.reply || "Answering…"}</p>}
       {turn.status === "error" && <p className="error">{turn.error}</p>}
@@ -319,12 +264,9 @@ function TurnView({ turn }: { turn: Turn }) {
 // The reply with every "[n]" turned into a link to passage n's article.
 // split() with a capture group keeps the "[n]" pieces in the array.
 function Reply({ reply, passages }: { reply: string; passages: Passage[] }) {
-  const parts = reply.split(/(\[\d+\])/);
-
-  return parts.map((part, i) => {
+  return reply.split(/(\[\d+\])/).map((part, i) => {
     const passage = passages[Number(part.slice(1, -1)) - 1];
-    // The parts never change order for a given reply, so the position is a
-    // stable key here.
+    // The parts never change order, so the position is a stable key.
     const key = `${i}:${part}`;
 
     if (/^\[\d+\]$/.test(part) && passage) {

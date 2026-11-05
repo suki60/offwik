@@ -1,12 +1,8 @@
-// Stage 6 eval set: questions about niche Simple English articles (small
-// towns, minor species, obscure people), written by reading each article.
+// The gold questions: niche Simple English articles (small towns, minor
+// species, obscure people) that the chat model can't answer from memory.
 // `title` is the article that holds the answer (exact match with
-// articles.title). `answers` are accepted spellings for closed-book grading:
-// the reply is correct if it contains one of them as a whole word.
-// After `npm run closed-book`, the questions the chat model already answers
-// correctly are removed: RAG has nothing to add there. The chat model is the
-// one that will answer on the phone (qwen3.5:0.8b), so the filtering is done
-// with that model.
+// articles.title). `answers` are accepted spellings: a reply is correct if
+// it contains one of them as a whole word.
 
 type Question = {
   question: string;

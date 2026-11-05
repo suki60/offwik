@@ -6,11 +6,9 @@ import { pipeline } from "node:stream/promises";
 
 // Setup step 1: download the Simple English dump from Hugging Face and check
 // it is exactly the file every number in PLAN.md was measured on.
-// - REVISION pins a dataset commit: `resolve/main` would silently pick up a
-//   newer upload and change the data.
-// - SHA256 is the hash Hugging Face publishes for this file (its LFS oid,
-//   checked 2026-10-30). A truncated or different file stops the setup.
-// Skips the download when data/simple.parquet is already there and matches.
+// - REVISION pins a dataset commit (`main` could change the data).
+// - SHA256 is the hash Hugging Face publishes for this file.
+// Skipped when data/simple.parquet is already there and matches.
 // Usage: npm run download
 
 const REVISION = "b04c8d1ceb2f5cd4588862100d08de323dccfbaa";

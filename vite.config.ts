@@ -2,24 +2,19 @@ import { existsSync, readFileSync } from "node:fs";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
-// Stage 8: HTTPS so the iPhone gets a secure origin (WebGPU is hidden on
-// plain http, except on localhost). certs/ is made by mkcert and ignored by
-// git; without it the server stays plain http on localhost.
-const hasCerts = existsSync("certs/key.pem") && existsSync("certs/cert.pem");
+// HTTPS when certs/ exists (made by hand, gitignored): the iPhone only gets
+// WebGPU and service workers on a secure origin. Without certs, plain http on
+// localhost.
+const hasCerts = existsSync("certs/key.pem");
 
-// Stage 7, step 4: the web app's dev server (npm run dev, port 5173).
-// Since stage 9 embedding and search run in the browser (server.ts and its
-// /api proxy are gone, see commit b0f7fae), and since stage 10 the answer
-// too, so the /ollama proxy is gone as well (see commit f95ccc9).
 export default defineConfig({
   plugins: [react()],
-  // Stage 10: dist/asset-manifest.json lists every file of the build, so the
-  // service worker (public/sw.js) can cache them all when it installs. Not
-  // the default .vite/manifest.json: `vite preview` doesn't serve dot folders.
+  // dist/asset-manifest.json lists the build's files for public/sw.js to
+  // cache (the default .vite/manifest.json isn't served: dot folder).
   build: { manifest: "asset-manifest.json" },
-  // `npm run preview` serves dist/ and reuses server's host and https.
+  // Also used by `npm run preview`.
   server: {
-    // Listen on the Wi-Fi too (not only localhost), so the phone can connect.
+    // Listen on the Wi-Fi too, so the phone can connect.
     host: hasCerts,
     https: hasCerts
       ? {

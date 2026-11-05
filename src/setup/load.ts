@@ -4,14 +4,12 @@ import { connect } from "../db.ts";
 import { chunkArticle } from "./chunker.ts";
 
 // Setup step 2: read every article from Parquet, chunk it, and store
-// articles + chunks in Postgres. No embeddings yet (embed.ts).
-// Additive: articles already in the database are skipped, so their chunks and
-// embeddings are kept. Rerunning setup after a crash doesn't lose work.
+// articles + chunks in Postgres. No embeddings yet (embed.ts). Articles
+// already in the database are skipped, so a rerun keeps earlier work.
 // Expect 238,243 articles and 370,859 chunks.
 // Usage: npm run load
 
-// Skips the two easy-to-spot kinds of link-only pages: disambiguation pages
-// and "List of" pages.
+// Skips link-only pages: disambiguation pages and "List of" pages.
 const duck = await (await DuckDBInstance.create()).connect();
 
 const reader = await duck.runAndReadAll(`
@@ -33,8 +31,7 @@ const articles = z.array(Article).parse(reader.getRowObjectsJson());
 console.log(`Read ${articles.length} articles from Parquet`);
 const db = await connect();
 
-// Never drops anything: tables are created only if they don't exist yet.
-// To start over (e.g. after changing the chunker), drop them by hand:
+// Tables are only created if they don't exist yet. To start over:
 //   docker compose exec db psql -U wiki -c "DROP TABLE chunks, articles"
 await db.query(`
   CREATE EXTENSION IF NOT EXISTS vector;
@@ -46,22 +43,16 @@ await db.query(`
   CREATE TABLE IF NOT EXISTS chunks (
     id serial PRIMARY KEY,
     article_id integer NOT NULL REFERENCES articles (id) ON DELETE CASCADE,
-    position integer NOT NULL,   -- order of the chunk inside its article
-    content text NOT NULL,       -- title + text: what gets embedded
-    embedding_nomic vector(768), -- nomic-embed-text, filled by embed.ts
+    position integer NOT NULL,    -- order of the chunk inside its article
+    content text NOT NULL,        -- title + text: what gets embedded
+    embedding_nomic vector(768),  -- nomic-embed-text (pgvector search)
+    embedding_arctic vector(384), -- snowflake-arctic-embed-s (the phone)
     UNIQUE (article_id, position)
   );
-  -- Stage 10: snowflake-arctic-embed-s, the embedder WebLLM can run next to
-  -- Llama on the phone. Filled by embed.ts. ADD COLUMN IF NOT EXISTS: also
-  -- adds it to a database created before stage 10, without touching the rest.
-  -- (Before stage 10 embedding_nomic was called embedding: renamed by hand
-  -- with ALTER TABLE chunks RENAME COLUMN embedding TO embedding_nomic.)
-  ALTER TABLE chunks ADD COLUMN IF NOT EXISTS embedding_arctic vector(384);
 `);
 
-// Bulk loading (stage 4): each batch of articles takes 2 queries, Postgres
-// turns arrays (one per column) back into rows with unnest(). All in one
-// transaction, so one commit at the end.
+// Bulk loading: 2 queries per batch of articles. Postgres turns the arrays
+// (one per column) back into rows with unnest(). One transaction for all.
 const BATCH_SIZE = 1000;
 
 const start = performance.now();
@@ -72,9 +63,8 @@ await db.query("BEGIN");
 for (let i = 0; i < articles.length; i += BATCH_SIZE) {
   const batch = articles.slice(i, i + BATCH_SIZE);
 
-  // ON CONFLICT DO NOTHING skips articles that are already there, and
-  // RETURNING id gives back only the ones actually inserted: only those
-  // get chunks (the others have theirs already).
+  // ON CONFLICT DO NOTHING skips articles already there; RETURNING id gives
+  // back only the inserted ones, and only those get chunks.
   const { rows } = await db.query<{ id: number }>(
     `INSERT INTO articles (id, title, url)
      SELECT * FROM unnest($1::integer[], $2::text[], $3::text[])

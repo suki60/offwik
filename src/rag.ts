@@ -1,5 +1,4 @@
-// Stage 7: the RAG prompt, shared by rag-eval.ts (Node) and the web app
-// (browser). No Node imports here, so Vite can bundle it as it is.
+// The RAG prompt, shared by rag-eval.ts (Node) and the web app (browser).
 
 export type Message = {
   role: "system" | "user" | "assistant";
@@ -9,24 +8,19 @@ export type Message = {
 // One retrieved chunk. `content` starts with "Title\n\n" (see chunker.ts).
 export type Passage = { title: string; url: string; content: string };
 
-// The model cites passages by number, not by URL: a 0.8B model copying
-// "https://simple.wikipedia.org/wiki/Loachapoka%2C%20Alabama" letter by letter
-// can garble it, while "[2]" is hard to get wrong. Code turns the number back
-// into a title + URL (citedPassages below).
+// The model cites passages by number, not by URL: a small model can garble a
+// long URL, "[2]" is hard to get wrong. citedPassages turns it back into a
+// title + URL.
 const SYSTEM_PROMPT = `You answer questions using only the numbered passages the user gives you.
 Rules:
 - Answer in one short sentence.
 - End your answer with the number of the passage you used in square brackets.
 - If the passages do not contain the answer, reply exactly: I don't know.`;
 
-// Few-shot example, sent as an earlier user/assistant turn (stage 7 rag-eval
-// with qwen3.5:0.8b):
-// - Rule only ("like [2]"): 23 of 48 replies were just "[1]", 19/48 correct.
-// - Example reply inside the rule: 36/48, but 6 replies copied it word for
-//   word ("The town was founded in 1850 [2].").
-// As a past exchange about other, made-up content, the model sees the format
-// in use instead of a sentence to paste. Passage 1 is a distractor, so the
-// example also shows picking the passage that holds the answer.
+// Few-shot example, sent as an earlier user/assistant turn about made-up
+// content: the model sees the format in use instead of a sentence to copy
+// (scores in PLAN.md, stage 7). Passage 1 is a distractor, so it also shows
+// picking the passage that holds the answer.
 const EXAMPLE_QUESTION = "When was the village of Quillby founded?";
 
 const EXAMPLE_PASSAGES: Passage[] = [
@@ -46,9 +40,8 @@ const EXAMPLE_PASSAGES: Passage[] = [
 
 const EXAMPLE_ANSWER = "Quillby was founded in 1732 [2].";
 
-// Passages first, question last: the question is the last thing the model
-// reads before answering. Drops the "Title\n\n" prefix of each chunk: the
-// title is already on the [n] line.
+// Passages first, question last (the last thing the model reads). Each
+// chunk's "Title\n\n" prefix is dropped: the title is on the [n] line.
 function userMessage(question: string, passages: Passage[]): Message {
   const context = passages
     .map(
@@ -82,8 +75,7 @@ export function citedPassages(reply: string, passages: Passage[]) {
     Number(match[1]),
   );
 
-  return [...new Set(numbers)].flatMap((n) => {
-    const passage = passages[n - 1];
-    return passage ? [passage] : [];
-  });
+  return [...new Set(numbers)]
+    .map((n) => passages[n - 1])
+    .filter((passage) => passage !== undefined);
 }

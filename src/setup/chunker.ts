@@ -1,5 +1,5 @@
-// Stage 2: split one article into chunks. Generic rules, nothing Wikipedia-specific:
-// split at blank lines, pack paragraphs up to MAX_CHARS, cut anything longer.
+// Split one article into chunks: split at blank lines, pack paragraphs up to
+// MAX_CHARS, cut anything longer.
 
 // ~300 tokens at 4 chars/token: small enough to stay on one topic,
 // big enough to hold a full paragraph or two.
