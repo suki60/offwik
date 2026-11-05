@@ -10,6 +10,8 @@
 // Not handled here, each has its own storage: /data/* (streamed into OPFS by
 // store.ts; caching it too would keep the 449 MB twice) and WebLLM's weights
 // and wasm (other origins, kept in WebLLM's own Cache API caches).
+// Except /data/meta.json (45 bytes): store.ts fetches it on every Start to
+// check the OPFS copies, so offline it has to come from here.
 // Registered by main.tsx, only in builds (`npm run build` + `npm run preview`).
 
 const CACHE = "wiki-rag-app";
@@ -55,7 +57,7 @@ self.addEventListener("fetch", (event) => {
   if (
     event.request.method !== "GET" ||
     url.origin !== self.location.origin ||
-    url.pathname.startsWith("/data/")
+    (url.pathname.startsWith("/data/") && url.pathname !== "/data/meta.json")
   ) {
     return;
   }
