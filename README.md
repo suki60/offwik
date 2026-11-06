@@ -1,4 +1,4 @@
-# wiki-rag
+# offwik
 
 RAG over an offline copy of Simple English Wikipedia, with local models (Ollama) and Postgres + pgvector. Goals, stages and measured numbers are in [PLAN.md](PLAN.md).
 

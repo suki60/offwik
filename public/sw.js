@@ -7,7 +7,7 @@
 // Skipped: /data/* (store.ts keeps it in OPFS) except meta.json, and other
 // origins (WebLLM caches its own models).
 
-const CACHE = "wiki-rag-app";
+const CACHE = "offwik-app";
 
 self.addEventListener("install", (event) => {
   event.waitUntil(precache());

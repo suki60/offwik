@@ -1,5 +1,5 @@
 {
-  "name": "wiki-rag",
+  "name": "offwik",
   "version": "1.0.0",
   "scripts": {
     "lint": "biome check .",

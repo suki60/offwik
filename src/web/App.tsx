@@ -148,7 +148,7 @@ export function App() {
       <header className="app-header">
         <div>
           <p className="eyebrow">SIMPLE ENGLISH WIKIPEDIA</p>
-          <h1>Wiki RAG</h1>
+          <h1>offwik</h1>
         </div>
         <button
           className="theme-toggle"

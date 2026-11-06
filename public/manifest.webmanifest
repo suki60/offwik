@@ -1,6 +1,6 @@
 {
-  "name": "Wiki RAG",
-  "short_name": "Wiki RAG",
+  "name": "offwik",
+  "short_name": "offwik",
   "description": "Ask Simple English Wikipedia, offline.",
   "start_url": "/",
   "display": "standalone",
