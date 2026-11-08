@@ -15,7 +15,8 @@
     "search-eval": "tsx src/eval/search-eval.ts",
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "npm run build && wrangler deploy"
   },
   "type": "module",
   "private": true,
@@ -36,6 +37,7 @@
     "@vitejs/plugin-react": "^6.1.2",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
-    "vite": "^8.3.5"
+    "vite": "^8.3.5",
+    "wrangler": "^4.158.0"
   }
 }

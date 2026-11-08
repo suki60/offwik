@@ -1,0 +1,11 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "offwik",
+  "main": "src/worker.ts",
+  "compatibility_date": "2026-11-07",
+  // The build (npm run build). Files that match no asset go to src/worker.ts.
+  "assets": { "directory": "./dist" },
+  "r2_buckets": [{ "binding": "DATA", "bucket_name": "offwik-data" }],
+  // Custom domain: deploy creates the DNS record and the certificate.
+  "routes": [{ "pattern": "offwik.com", "custom_domain": true }]
+}
