@@ -7,7 +7,6 @@ import {
   loadModels,
   search,
 } from "./pipeline.ts";
-import { runSearchEval } from "./search-eval.ts";
 import { openStore } from "./store.ts";
 
 // Ask a question, see the answer with its citations and the passages it was
@@ -32,8 +31,6 @@ export function App() {
   const [status, setStatus] = useState("");
   const [isStarted, setIsStarted] = useState(false);
   const [isReady, setIsReady] = useState(false);
-  const [evalStatus, setEvalStatus] = useState("");
-  const isEvaluating = evalStatus.endsWith("…");
 
   const isBusy = turns.some(
     (turn) => turn.status === "searching" || turn.status === "answering",
@@ -64,23 +61,6 @@ export function App() {
       setStatus("");
     } catch (error) {
       setStatus(`Loading error: ${error}`);
-    }
-  }
-
-  // The 48 gold questions through embedQuery + search only.
-  async function evaluate() {
-    setEvalStatus("Search eval…");
-
-    try {
-      const result = await runSearchEval((done) =>
-        setEvalStatus(`Search eval: ${done}/48…`),
-      );
-
-      setEvalStatus(
-        `Search eval: ${result.hits}/${result.total} · per question: embed ${result.embedMs.toFixed(0)} ms · search ${result.searchMs.toFixed(0)} ms${result.misses.map((miss) => `\n✗ ${miss}`).join("")}`,
-      );
-    } catch (error) {
-      setEvalStatus(`Search eval error: ${error}`);
     }
   }
 
@@ -181,20 +161,6 @@ export function App() {
         </p>
       )}
       {status && <p className="meta">{status}</p>}
-      <p className="meta">
-        <button
-          type="button"
-          onClick={evaluate}
-          disabled={!isReady || isBusy || isEvaluating}
-        >
-          Run search eval
-        </button>
-      </p>
-      {evalStatus && (
-        <p className="meta" style={{ whiteSpace: "pre-line" }}>
-          {evalStatus}
-        </p>
-      )}
       {turns.map((turn) => (
         <TurnView key={turn.id} turn={turn} />
       ))}

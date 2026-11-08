@@ -55,7 +55,7 @@ src/
   search.ts          top-k query (pgvector HNSW), the reference
   vector-search.ts   Hamming + int8 rescore over public/data (Node + browser)
   web/               React app: pipeline.ts (embed │ search │ answer), App.tsx,
-                     store.ts (OPFS), search-eval.ts (in-browser eval)
+                     store.ts (OPFS)
   setup/             download → load (chunker) → embed → index → export
   eval/              gold questions, rag-eval, search-eval
 ```
