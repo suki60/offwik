@@ -1,3 +1,6 @@
+# Kept from before the rename to offwik, so the loaded pgdata volume is reused.
+name: wiki-rag
+
 services:
   db:
     image: pgvector/pgvector:pg17
